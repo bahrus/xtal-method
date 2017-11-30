@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="xtal-method">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `xtal-method`
+     * Create a localized link between an input object and a functional renderer
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class XtalMethod extends Polymer.Element {
+      static get is() { return 'xtal-method'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'xtal-method'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(XtalMethod.is, XtalMethod);
+  </script>
+</dom-module>
