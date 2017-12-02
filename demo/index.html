@@ -24,7 +24,7 @@
 <body>
   <div class="vertical-section-container centered">
     <h3>Basic xtal-method demo</h3>
-    <p>NB:  Demo only works in browsers that support dynamic imports (see markup below to see why).</p>
+    <p>NB:  Demo only works in browsers that support <a href="https://developers.google.com/web/updates/2017/11/dynamic-import">dynamic imports</a> (see markup below to see why). </p>
     <demo-snippet>
 
       <template>
@@ -55,7 +55,7 @@
                       </script>
               </json-merge>           
             <xtal-method input="[[todos]]">
-              <script type="application/lit-html">
+              <script type="text/ecmascript">
                     const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
                     const { repeat } = await import(root + 'lib/repeat.js');
                     const { html, render } = await import(root + 'lit-html.js');
