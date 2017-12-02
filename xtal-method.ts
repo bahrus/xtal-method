@@ -15,32 +15,42 @@
             return 'xtal-method';
         }
 
-        _rendererObject;
-        set rendererObject(val: object){
-            this._rendererObject = val;
+        _renderer;
+        set renderer(val: object){
+            this._renderer = val;
+            this.render();
+        }
+        get renderer(){
+            return this._renderer;
         }
 
-        _inputObject;
-        set inputObject(val: object){
-            this._inputObject = val;
+        _input;
+        set input(val: object){
+            this._input = val;
             this.render();
+        }
+        get input(){
+            return this._input;
         }
         disconnectedCallback() {
             //this._domObserver.disconnect();
         }
         connectedCallback() {
-            this.evaluateRendererObject();
+            //setTimeout(() =>{
+                this.evaluateScriptText();
+            //}, 10000);
+            
         }
         render(){
-            if(!this._rendererObject) return;
-            if(!this._inputObject) return;
+            if(!this._renderer) return;
+            if(!this._input) return;
             if(!this._target){
                 const de = document.createElement("div");
                 this._target = this.insertAdjacentElement('beforebegin', de) as HTMLDivElement;
             }
-            this._rendererObject.render(this._inputObject, this._target);
+            this._renderer(this._input, this._target);
         }
-        evaluateRendererObject(){
+        evaluateScriptText(){
             const templateTag = this.querySelector('template') as HTMLTemplateElement;
             let clone: DocumentFragment;
             if (templateTag) {
@@ -79,12 +89,12 @@
             // modifiedText = this.replaceAll(modifiedText, 'export const ', 'exportconst.');
             const splitText = innerText.split('export const ');
             let iPos = 0;
-            //let modifiedText = splitText[0];
-            for(let i = 1, ii = splitText.length; i < ii; i+=2){
+            
+            for(let i = 1, ii = splitText.length; i < ii; i++){
                 const token = splitText[i];
                 const iPosOfEq = token.indexOf('=');
                 const lhs = token.substr(0, iPosOfEq).trim();
-                splitText[i] = 'const ' + lhs + ' = exportconstant.' + lhs + ' = ' + token.substr(iPosOfEq + 1);
+                splitText[i] = 'const ' + lhs + ' = exportconst.' + lhs + ' = ' + token.substr(iPosOfEq + 1);
             }
             const modifiedText = splitText.join('');
             const protectedScript = `[
@@ -95,12 +105,12 @@
             }
             ]`;
             const fnArr =  eval(protectedScript);
+            const _this = this;
             const exportedSymbols = fnArr[0]().then(exportedSymbols =>{
-                debugger;
+                Object.assign(_this, exportedSymbols);
             }).catch(e =>{
                 throw e;
             })
-            debugger;
             //Object.assign(this, srcObj);
         }
     }
