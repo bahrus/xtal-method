@@ -7,10 +7,10 @@
     <title>xtal-method demo</title>
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-
+    <script src="../xtal-method.js"></script>
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-    <link rel="import" href="../xtal-method.html">
+    <!-- <link rel="import" href="../xtal-method.html"> -->
 
     <custom-style>
       <style is="custom-style" include="demo-pages-shared-styles">
@@ -22,7 +22,31 @@
       <h3>Basic xtal-method demo</h3>
       <demo-snippet>
         <template>
-          <xtal-method></xtal-method>
+          <xtal-method>
+            <template>
+              <script type="module">
+                const root = './node_modules/lit-html/';
+                const {repeat} = await import(root + 'lib/repeat.js');
+                const {html, render} = await import(root + 'lit-html.js');
+                const todo = items => {
+                  return html`
+                    <h1>My Todos</h1>
+                    <ul>
+                      ${repeat(
+                        items,
+                        item => item.id,
+                        item => html`
+                          <li class="${item.done ? 'done' : ''}">${item.value}</li>
+                        `
+                      )}
+                    </ul>
+                  `;
+                };
+                export const renderer = (list, target) => render(todo(list), target);
+                export const someOtherSymbol = 'i am here';
+              </script>
+            </template>
+          </xtal-method>
         </template>
       </demo-snippet>
     </div>

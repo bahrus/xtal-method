@@ -1,5 +1,9 @@
 # \<xtal-method\>
 
+<xtal-method>
+<template>
+</xtal-method>
+
 Create a localized link between an input object and a functional renderer
 
 ## Install the Polymer-CLI
