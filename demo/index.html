@@ -31,17 +31,29 @@
         <dom-bind>
           <template>
 
-            <json-merge watch="[]" result="{{todos}}">
+            <json-merge watch="[]" result="{{todos}}" delay="1000">
               <script type="application/json">
                       [
                         [
-                          { "id": 1, "value": "Mop the floor", "done": false },
+                          { "id": 1, "value": "Sweep the floor", "done": false },
                           { "id": 2, "value": "Prepare fancy salad", "done": true },
                           { "id": 3, "value": "Get a funky haircut", "done": false }
                         ]
                       ]
                     </script>
             </json-merge>
+            <json-merge watch="[]" result="{{todos}}" delay="4000">
+                <script type="application/json">
+                        [
+                          [
+                            { "id": 1, "value": "Mop the floor", "done": false },
+                            { "id": 2, "value": "Eat fancy salad", "done": true },
+                            { "id": 3, "value": "Cry about the haircut", "done": false },
+                            { "id": 4, "value": "Watch another celebrety flush their career down the toilet", "done": false }
+                          ]
+                        ]
+                      </script>
+              </json-merge>           
             <xtal-method input="[[todos]]">
               <script type="application/lit-html">
                     const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
