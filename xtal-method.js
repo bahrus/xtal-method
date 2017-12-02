@@ -93,7 +93,7 @@
             const exportedSymbols = fnArr[0]().then(exportedSymbols => {
                 debugger;
             }).catch(e => {
-                debugger;
+                throw e;
             });
             debugger;
             //Object.assign(this, srcObj);
