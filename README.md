@@ -6,16 +6,15 @@
 
 The \<xtal-method\> web component (with no dependencies) allows one to utilize a functional renderer, like [lit-html](https://alligator.io/web-components/lit-html/) or [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e), without turning the entire application into one giant heap of JavaScript.  
 
-With this component, one creates a localized link between an input object and a functional renderer.  The (tagged) literal template can be defined within the web component light children itself:
+With this component, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The (tagged) literal template can be defined via web component light child:
 
 ```html
 <xtal-method input="[[todos]]">
-    <template>
-    <script type="text/ecmascript">
+    <script type="text/ecmascript ish">
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
-        const todo = items => {
+        const todoListFormatter = items => {
             return html`
                         <h1>My Todos</h1>
                         <ul>
@@ -25,10 +24,9 @@ With this component, one creates a localized link between an input object and a 
                         </ul>
                         `;
         };
-        export const renderer = (list, target) => render(todo(list), target);
+        export const renderer = (list, target) => render(todoListFormatter(list), target);
 
     </script>
-    </template>
 </xtal-method>
                 
 ```
@@ -41,7 +39,7 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
 
 ```html
 <xtal-method input="[[todos]]">
-    <script type="text/ecmascript">
+    <script type="text/ecmascript ish">
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
