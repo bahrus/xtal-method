@@ -55,14 +55,13 @@
                       </script>
               </json-merge>           
             <xtal-method input="[[todos]]">
-              <!-- No template tag, as dom-bind seems to cause issues  with that.
-                Script doesn't get executed due to invalid syntax, but need a better solution
-                for this dilemma-->
-              <script type="text/ecmascript">
+              <!-- Underscore is added in type attribute below to make the script inactive, but preserve
+              syntax highlighting in VS Code -->
+              <script type="text/ecmascript ish">
                     const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
                     const { repeat } = await import(root + 'lib/repeat.js');
                     const { html, render } = await import(root + 'lit-html.js');
-                    const todo = items => {
+                    const todoFormatter = items => {
                       return html`
                                     <h1>My Todos</h1>
                                     <ul>
@@ -76,7 +75,7 @@
                                     </ul>
                                   `;
                     };
-                    export const renderer = (list, target) => render(todo(list), target);
+                    export const renderer = (list, target) => render(todoFormatter(list), target);
                 </script>
             </xtal-method>
           </template>
