@@ -25,6 +25,8 @@ With this component, one creates a localized inline connection between an input 
                 
 ```
 
+Is a custom element required in order to accomplish the localness feature of \<xtal-method\>?  Alas, no, not when support for support for [import.meta](http://2ality.com/2017/11/import-meta.html) becomes widespread.  I think.  Still, the hope is that this custom element will reduce annoying boilerplate code, as we shall see.
+
 \<xtal-method\> only recognizes two properties currently:  input and renderer.
 
 As the input property of \<xtal-method\> changes, the renderer will generate the html output, and insert it adjacent to the \<xtal-method\> element instance.
@@ -57,6 +59,8 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
 </xtal-method>
 ```
 
+Another approach to server-side generated content is discussed below.
+
 ## Syntax Shenanigans
 
 It is highly desired that the contents of the script tag not be processed by the browser before being manipulated by the \<xtal-method\> as it is a waste of processing and a potential source of unintended side effects (like introducing a bunch of global variables).  There are a number of ways this can be done, with the pro's and con's listed below:
@@ -74,11 +78,15 @@ In particular, the import statements will be the first candidate for sharing.
 To share fragments of Javascript, define a fragment of JavaScript thusly:
 
 ```html
-<script type="module ish" id="lit-html-imports">
+  <script type="module ish" id="root-lit-html">
     const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
+  </script>
+  <script type="module ish" id="lit-html">
+      const { html, render } = await import(root + 'lit-html.js');
+  </script>
+  <script type="module ish" id="lit-html/lib/repeat">
     const { repeat } = await import(root + 'lib/repeat.js');
-    const { html, render } = await import(root + 'lit-html.js');
-</script>
+  </script>
 ```
 
 (Place in header of index.html?)
@@ -88,7 +96,7 @@ And then reference it as follows:
 ```html
 <xtal-method input="[[todos]]">
     <script type="module ish">
-        scriptTag => XtalMethod.import(scriptTag, '#lit-html-imports'); //https://github.com/mishoo/UglifyJS2/issues/671
+        scriptTag=>XtalMethod.insert(scriptTag, '#root-lit-html,#lit-html,#lit-html/lib/repeat'); //https://github.com/mishoo/UglifyJS2/issues/671
         const todoFormatter = items => html`
             <h1>My Todos</h1>
             <ul>
@@ -109,7 +117,7 @@ And then reference it as follows:
 </xtal-method>
 ```
 
-The second argument, of type string, of 'xtalMethod.import()' is an extremely limited pseudo css selector.  To specify multiple script tags, use the css comma delimiter.  Fragments will be inserted in the order of the list.
+The second argument, of type string, of 'xtalMethod.import()' is an extremely limited pseudo css selector.  To specify multiple script tags by id, use the css comma delimiter.  Fragments will be inserted in the order of the list.
 
 ## Install the Polymer-CLI
 
