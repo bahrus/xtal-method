@@ -32,7 +32,7 @@ As the input property of \<xtal-method\> changes, the renderer will generate the
 The script tag inside the \<xtal-method\> will apply all the export const's to the xtal-method tag.  So the initial input property can also be specified  (server-side generated)  within the script tag.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
 ```html
-<xtal-method input="[[todos]]">
+<xtal-method>
     <script type="module ish">
         const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
@@ -57,13 +57,13 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
 </xtal-method>
 ```
 
-## Syntax Notes
+## Syntax Shenanigans
 
 It is highly desired that the contents of the script tag not be processed by the browser before being manipulated by the \<xtal-method\> as it is a waste of processing and a potential source of unintended side effects (like introducing a bunch of global variables).  There are a number of ways this can be done, with the pro's and con's listed below:
 
-1. Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, even if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative), this immediately posed a problem, which is why the following alternatives are listed.
+1. Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative-ish), this immediately posed a problem, which is why the following alternatives are listed (and used in the demo).
 2. Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code stops providing syntax highlighting / basic linting when doing this.  But it works with a high degree of confidence.
-3. Give the script tag attribute *type* a value that the browser will (hopefully) not recognize as JavaScript, but your favorite editor is fooled into thinking it is JavaScript.  For VS Code, such a value is (currently) type="module ish", which is shown above. I plan to try this out for a while in different browsers (as they start to support dynamic imports).  Hopefully no one will bring this loophole to the VS Code editor's attention (shh!!!).
+3. Give the script tag attribute *type* a value that the browser will (hopefully) not recognize as JavaScript, but your favorite editor is fooled into thinking *is* JavaScript.  For VS Code, such a value is (currently) type="module ish", which is shown above. I plan to try this out for a while in different browsers (as they start to support dynamic imports).  Hopefully no one will bring this loophole to the VS Code team's attention (shh!!!).
 
 ### Boilerplate Busting
 
@@ -88,7 +88,7 @@ And then reference it as follows:
 ```html
 <xtal-method input="[[todos]]">
     <script type="module ish">
-        xtal_in_hash_import('#lit-html-imports');
+        scriptTag => XtalMethod.import(scriptTag, '#lit-html-imports'); //https://github.com/mishoo/UglifyJS2/issues/671
         const todoFormatter = items => html`
             <h1>My Todos</h1>
             <ul>
@@ -108,6 +108,8 @@ And then reference it as follows:
     </script>
 </xtal-method>
 ```
+
+The second argument, of type string, of 'xtalMethod.import()' is an extremely limited pseudo css selector.  To specify multiple script tags, use the css comma delimiter.  Fragments will be inserted in the order of the list.
 
 ## Install the Polymer-CLI
 

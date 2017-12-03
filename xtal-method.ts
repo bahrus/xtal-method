@@ -50,6 +50,9 @@
             }
             this._renderer(this._input, this._target);
         }
+        static import(scriptTag: HTMLScriptElement, cssSelector: string){
+            debugger;
+        }
         evaluateScriptText(){
             const templateTag = this.querySelector('template') as HTMLTemplateElement;
             let clone: DocumentFragment;
