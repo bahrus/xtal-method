@@ -65,7 +65,7 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
         ]
     </script>
 </xtal-method>
-
+```
 
 ## Install the Polymer-CLI
 
