@@ -34,7 +34,7 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
 ```html
 <xtal-method input="[[todos]]">
     <script type="text/ecmascript ish">
-        const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
+        const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
         const todoFormatter = items => html`
