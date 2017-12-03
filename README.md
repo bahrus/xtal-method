@@ -27,9 +27,9 @@ With this component, one creates a localized inline connection between an input 
 
 Is a custom element required in order to accomplish the localness feature of \<xtal-method\>?  Alas, no, not when support for support for [import.meta](http://2ality.com/2017/11/import-meta.html) becomes widespread.  I think.  Still, the hope is that this custom element will reduce annoying boilerplate code, as we shall see.
 
-\<xtal-method\> only recognizes two properties currently:  input and renderer.
+\<xtal-method\> only recognizes two key, required properties for anything to happen:  input and renderer.
 
-As the input property of \<xtal-method\> changes, the renderer will generate the html output, and insert it adjacent to the \<xtal-method\> element instance.
+As the input property of \<xtal-method\> is established and then changes, the renderer will generate the html output, and insert it adjacent to the \<xtal-method\> element instance, or update it the same target element later. See server-side processing section below for an alternative.
 
 The script tag inside the \<xtal-method\> will apply all the export const's to the xtal-method tag.  So the initial input property can also be specified  (server-side generated)  within the script tag.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
@@ -69,7 +69,7 @@ It is highly desired that the contents of the script tag not be processed by the
 2. Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code stops providing syntax highlighting / basic linting when doing this.  More sophisticated editors, like WebStorm can be trained to recognize custom attributes.  And of course a VS code extension could be built.  This solution should work with a high degree of confidence.
 3. Give the script tag attribute *type* a value that the browser will (hopefully) **not** recognize as JavaScript, but your favorite editor is fooled into thinking **is** JavaScript.  For VS Code, an example of such a value is (currently) type="module ish", which is shown above. I plan to try this out for a while in different browsers (as they start to support dynamic imports).  Hopefully no one will bring this loophole to the VS Code team's attention (shh!!!).
 
-### Boilerplate Busting
+### Boilerplate Busting with Script inserts
 
 There will tend to be some amount of repetition between instances of this web component, assuming the same rendering library is used more than once.
 
@@ -110,7 +110,15 @@ And then reference it as follows:
 </xtal-method>
 ```
 
-The second argument, of type string, of 'xtalMethod.import()' is an extremely limited pseudo css selector.  To specify multiple script tags by id, use the css comma delimiter.  Fragments will be inserted in the order of the list.
+The second argument, of type string, of 'xtalMethod.import(),' is an extremely limited pseudo css selector.  To specify multiple script tags by id, use the css comma delimiter.  Fragments will be inserted in the order of the list.
+
+### Server-side rendering if initial paint
+
+By default, \<xtal-method\> dynamically creates a div element as the rendering taget, and prepends it to the \<xtal-method\> tag.  This serves as the target element for where to dump the html (or svg).
+
+However, it may be desirable to improve the time to first paint by generating the initial HTML on the server, and not providing any input object initially, until user interaction requires an update.
+
+In this case, insert the html as a light child within the \<xtal-method\>, starting from a single root tag.  The root tag of that html should have attribute role="target".  
 
 ## Install the Polymer-CLI
 

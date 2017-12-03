@@ -48,8 +48,15 @@
             if (!this._input)
                 return;
             if (!this._target) {
-                const de = document.createElement("div");
-                this._target = this.insertAdjacentElement('beforebegin', de);
+                const test = this.querySelector('[role="target"]');
+                if (test) {
+                    this._target = test;
+                }
+                else {
+                    const de = document.createElement("div");
+                    //de.setAttribute()
+                    this._target = this.insertAdjacentElement('beforebegin', de);
+                }
             }
             this._renderer(this._input, this._target);
         }
