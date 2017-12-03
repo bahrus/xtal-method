@@ -1,10 +1,6 @@
 # \<xtal-method\>
 
-<xtal-method>
-<template>
-</xtal-method>
-
-The \<xtal-method\> web component (with no dependencies) allows one to utilize a functional renderer, like [lit-html](https://alligator.io/web-components/lit-html/) or [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e), without turning the entire application into one giant heap of JavaScript.  
+The \<xtal-method\> web component is a dependency free custom element that allows one to utilize a functional renderer, like [lit-html](https://alligator.io/web-components/lit-html/) or [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e), without turning the entire application into one giant heap of JavaScript.  
 
 With this component, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The (tagged) literal template can be defined via web component light child:
 
@@ -14,17 +10,15 @@ With this component, one creates a localized inline connection between an input 
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
-        const todoListFormatter = items => {
-            return html`
-                        <h1>My Todos</h1>
-                        <ul>
-                                                                                    ${repeat(items, item => item.id,item => html`
-                          <li class="${item.done ? 'done' : ''}">${item.value}</li>
-                                                                                    `)}
-                        </ul>
-                        `;
-        };
-        export const renderer = (list, target) => render(todoListFormatter(list), target);
+        const todoFormatter = items => html`
+            <h1>My Todos</h1>
+            <ul>
+                                                                        ${repeat(items, item => item.id,  item => html`
+                <li class="${item.done ? 'done' : ''}">${item.value}</li>
+                                                                        `)}
+            </ul>
+        `;
+        export const renderer = (list, target) => render(todoFormatter(list), target);
 
     </script>
 </xtal-method>
@@ -43,17 +37,15 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
-        const todo = items => {
-            return html`
-                        <h1>My Todos</h1>
-                        <ul>
-                                                                                    ${repeat(items, item => item.id,item => html`
-                          <li class="${item.done ? 'done' : ''}">${item.value}</li>
-                                                                                    `)}
-                        </ul>
-                        `;
-        };
-        export const renderer = (list, target) => render(todo(list), target);
+        const todoFormatter = items => html`
+            <h1>My Todos</h1>
+            <ul>
+                                                                        ${repeat(items, item => item.id,  item => html`
+                <li class="${item.done ? 'done' : ''}">${item.value}</li>
+                                                                        `)}
+            </ul>
+        `;
+        export const renderer = (list, target) => render(todoFormatter(list), target);
 
         //server-side generated?
         export const input = [
@@ -64,6 +56,14 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
     </script>
 </xtal-method>
 ```
+
+## Syntax Notes
+
+It is highly desired that the contents of the script tag not be processed by the browser before being manipulated by the \<xtal-method\> as it is a waste of processing and a potential source of unintended side effects (like introducing a bunch of global variables).  There are a number of ways this can be done, with the pro's and con's listed below:
+
+>Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, even if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative), this immediately posed a problem, which is why the following alternatives are listed.
+>Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code stops providing syntax highlighting / basic linting when doing this.  But it works with a high degree of confidence.
+>Give the script tag attribute *type* a value that the browser will (hopefully) not recognize as JavaScript, but your favorite editor is fooled into thinking it is JavaScript.  For VS Code, such a value is (currently) type="text/ecmascript ish", which is shown above. I plan to try this out for a while in different browsers (as they start to support dynamic imports).  Hopefully no one will bring this loophole to the VS Code editor's attention (shh!!!).
 
 ## Install the Polymer-CLI
 
