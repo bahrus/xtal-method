@@ -6,7 +6,7 @@ With this component, one creates a localized inline connection between an input 
 
 ```html
 <xtal-method input="[[todos]]">
-    <script type="text/ecmascript ish">
+    <script type="module ish">
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
@@ -33,7 +33,7 @@ The script tag inside the \<xtal-method\> will apply all the export const's to t
 
 ```html
 <xtal-method input="[[todos]]">
-    <script type="text/ecmascript ish">
+    <script type="module ish">
         const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
@@ -63,7 +63,7 @@ It is highly desired that the contents of the script tag not be processed by the
 
 1. Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, even if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative), this immediately posed a problem, which is why the following alternatives are listed.
 2. Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code stops providing syntax highlighting / basic linting when doing this.  But it works with a high degree of confidence.
-3. Give the script tag attribute *type* a value that the browser will (hopefully) not recognize as JavaScript, but your favorite editor is fooled into thinking it is JavaScript.  For VS Code, such a value is (currently) type="text/ecmascript ish", which is shown above. I plan to try this out for a while in different browsers (as they start to support dynamic imports).  Hopefully no one will bring this loophole to the VS Code editor's attention (shh!!!).
+3. Give the script tag attribute *type* a value that the browser will (hopefully) not recognize as JavaScript, but your favorite editor is fooled into thinking it is JavaScript.  For VS Code, such a value is (currently) type="module ish", which is shown above. I plan to try this out for a while in different browsers (as they start to support dynamic imports).  Hopefully no one will bring this loophole to the VS Code editor's attention (shh!!!).
 
 ## Install the Polymer-CLI
 

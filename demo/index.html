@@ -57,7 +57,7 @@
             <xtal-method input="[[todos]]">
               <!-- "ish" is added in type attribute below to make the script inactive, but preserve
               syntax highlighting in VS Code (at least)-->
-              <script type="text/ecmascript ish">
+              <script type="module ish">
                     const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
                     const { repeat } = await import(root + 'lib/repeat.js');
                     const { html, render } = await import(root + 'lit-html.js');
