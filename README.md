@@ -106,13 +106,6 @@ And then reference it as follows:
             </ul>
         `;
         export const renderer = (list, target) => render(todoFormatter(list), target);
-
-        //server-side generated?
-        export const input = [
-            { "id": 1, "value": "Sweep the floor", "done": false },
-            { "id": 2, "value": "Prepare fancy salad", "done": true },
-            { "id": 3, "value": "Get a funky haircut", "done": false }
-        ]
     </script>
 </xtal-method>
 ```

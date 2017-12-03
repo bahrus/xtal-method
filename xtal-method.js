@@ -8,6 +8,15 @@
     * @demo demo/index.html
     */
     class XtalMethod extends HTMLElement {
+        constructor() {
+            super(...arguments);
+            // replaceAll(target: string, search: string, replacement: string) {
+            //     //https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+            //     return target.split(search).join(replacement);
+            // }
+            //regExp = /(.*)export(\s+)const(\s+)[a-zA-Z]+(\s*)=/g;
+            this.insertFragmentRegExp = /scriptTag=>XtalMethod.insert\(scriptTag,(.*)\);/g;
+        }
         static get is() {
             return 'xtal-method';
         }
@@ -44,6 +53,9 @@
             }
             this._renderer(this._input, this._target);
         }
+        static insert(scriptTag, cssSelector) {
+            debugger;
+        }
         evaluateScriptText() {
             const templateTag = this.querySelector('template');
             let clone;
@@ -63,25 +75,36 @@
             }
             this.applyScript(scriptTag);
         }
-        // replaceAll(target: string, search: string, replacement: string) {
-        //     //https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-        //     return target.split(search).join(replacement);
-        // }
-        // regExp = /(.*)export(\s+)const(\s+)[a-zA-Z]+(\s*)=/g;
         applyScript(scriptTag) {
             const innerText = scriptTag.innerText;
             if (innerText === this._previousEvaluatedText)
                 return;
             this._previousEvaluatedText = innerText;
-            //const isIE = (navigator.userAgent.indexOf('Trident') > -1);
-            //const constOrVar = isIE ? 'var' : 'const';
-            //let modifiedText = innerText;
-            // const splitHash = innerText.split(this.regExp);
-            // const test2 = this.regExp.exec(modifiedText);
-            // //this.regExp.
-            // debugger;
-            // modifiedText = this.replaceAll(modifiedText, 'export const ', 'exportconst.');
-            const splitText = innerText.replace('alert', '//alert').split('export const ');
+            // let matches;
+            // while (matches = this.insertFragmentRegExp.exec(innerText)) {
+            //   insertsEliminatedText = insertsEliminatedText.replace('scriptTag=>XtalMethod.insert(scriptTag,' + matches[1] + ');', '');
+            //   console.log(matches);
+            //   console.log('Middle text is: ' + matches[1]);
+            // }
+            const splitInsertText = innerText.split(this.insertFragmentRegExp);
+            const insertedText = splitInsertText.map((val, idx) => {
+                if (idx % 2 === 0)
+                    return val;
+                let newText = '';
+                const ids = val.split(',').forEach(id => {
+                    const scriptInclude = document.getElementById(id.replace("'", '').replace('#', '').trim());
+                    if (scriptInclude) {
+                        newText += scriptInclude.innerHTML;
+                    }
+                    else {
+                        console.error('script tag with selector ' + id + ' not found');
+                    }
+                });
+                return newText;
+            });
+            const insertsEliminatedText = insertedText.join('');
+            //console.log(insertsEliminatedText);
+            const splitText = insertsEliminatedText.split('export const ');
             let iPos = 0;
             for (let i = 1, ii = splitText.length; i < ii; i++) {
                 const token = splitText[i];
