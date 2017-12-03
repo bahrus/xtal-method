@@ -10,6 +10,7 @@ With this component, one creates a localized link between an input object and a 
 
 ```html
 <xtal-method input="[[todos]]">
+    <template>
     <script type="text/ecmascript">
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
@@ -27,6 +28,7 @@ With this component, one creates a localized link between an input object and a 
         export const renderer = (list, target) => render(todo(list), target);
 
     </script>
+    </template>
 </xtal-method>
                 
 ```

@@ -63,7 +63,7 @@
                 scriptTag = clone.querySelector('script');
             }
             if (!scriptTag ) {
-                //console.error(errRoot + 'No script tag  found to apply.' + this._CssSelector);
+                console.error('No script tag  found to apply.' );
                 return;
             }
             this.applyScript(scriptTag);
@@ -87,7 +87,7 @@
             // //this.regExp.
             // debugger;
             // modifiedText = this.replaceAll(modifiedText, 'export const ', 'exportconst.');
-            const splitText = innerText.split('export const ');
+            const splitText = innerText.replace('alert', '//alert').split('export const ');
             let iPos = 0;
             
             for(let i = 1, ii = splitText.length; i < ii; i++){

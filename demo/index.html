@@ -55,6 +55,9 @@
                       </script>
               </json-merge>           
             <xtal-method input="[[todos]]">
+              <!-- No template tag, as dom-bind seems to cause issues  with that.
+                Script doesn't get executed due to invalid syntax, but need a better solution
+                for this dilemma-->
               <script type="text/ecmascript">
                     const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
                     const { repeat } = await import(root + 'lib/repeat.js');
@@ -74,8 +77,7 @@
                                   `;
                     };
                     export const renderer = (list, target) => render(todo(list), target);
-                  </script>
-              
+                </script>
             </xtal-method>
           </template>
         </dom-bind>
