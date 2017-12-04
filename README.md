@@ -112,13 +112,38 @@ And then reference it as follows:
 
 The second argument, of type string, of 'xtalMethod.import(),' is an extremely limited pseudo css selector.  To specify multiple script tags by id, use the css comma delimiter.  Fragments will be inserted in the order of the list.
 
-### Server-side rendering if initial paint
+## Server-side rendering of initial paint
 
 By default, \<xtal-method\> dynamically creates a div element as the rendering taget, and prepends it to the \<xtal-method\> tag.  This serves as the target element for where to dump the html (or svg).
 
 However, it may be desirable to improve the time to first paint by generating the initial HTML on the server, and not providing any input object initially, until user interaction requires an update.
 
-In this case, insert the html as a light child within the \<xtal-method\>, starting from a single root tag.  The root tag of that html should have attribute role="target".  
+In this case, insert the html as a light child within the \<xtal-method\>, starting from a single root tag.  The root tag of that html should have attribute role="target". 
+
+###  Inverse Functional derendering
+
+If SSR is used, and the initial state needs to something that other components can bind to, it can be useful to send both the formatted HTML *and* the JSON from which the HTML was derived down the wire.
+
+So two additional features are defined for that purpose:  reverse-render and the init-state-changed event.
+
+*derender* is a property of type function.  It takes the rendered (first paint) html (or svg) and "reverse engineers" the markup data, by extracting out the data and turning it into a plain old JavaScript object, which when applying the renderer function would produce the same results.  Mathematically, it is the "inverse" of the renderer function.  The result of applying the derender function is broadcast as a custom event with name "init-state-changed," which hosting web components (Polymer being a prime example here) can listen for and bind to.  The markup can look like this:
+
+```html
+<xtal-method init-state="{{originalTodoList}}">
+    <script type="module ish">
+        export const derenderer = (serverSideGeneratedHtml) =>{
+            const todos = [];
+            serverSideGeneratedHTML.querySelectorAll('li').forEach(liEl =>{
+                const todo = {
+                    value = liEl.innerText
+                };
+                todos.push(todo);
+            });
+            return todos;
+        }
+    </script>
+<xtal-method>
+```
 
 ## Install the Polymer-CLI
 
