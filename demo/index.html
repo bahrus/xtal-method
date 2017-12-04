@@ -70,7 +70,7 @@
               <script type="module ish">
                     scriptTag=>XtalMethod.insert(scriptTag, '#root-lit-html,#lit-html,#lit-html/lib/repeat');
                     const todoFormatter = items => html`
-                      <h1>My Todos</h1>
+                      <h1 on-click="dosomething">My Todos</h1>
                         <ul>
                                                                                     ${repeat(items, item => item.id,  item => html`
                           <li class="${item.done ? 'done' : ''}">${item.value}</li>
@@ -79,11 +79,7 @@
                     `;
                     export const renderer = (list, target) => render(todoFormatter(list), target);
                 </script>
-                <div role="target">
-                  <ul>
-                    <li>Loading...</li>
-                  </ul>
-                </div>
+                
             </xtal-method>
           </template>
         </dom-bind>

@@ -50,12 +50,17 @@
                     this._target = test as HTMLElement;
                 }else{
                     const de = document.createElement("div");
-                    //de.setAttribute()
-                    this._target = this.insertAdjacentElement('beforebegin', de) as HTMLElement;
+                    de.setAttribute('role', 'target');
+                    this._target = this.appendChild(de);
+                    //this._target = this.insertAdjacentElement('beforebegin', de) as HTMLElement;
                 }
  
             }
             this._renderer(this._input, this._target);
+            this.dispatchEvent(new CustomEvent('dom-change', {
+                bubbles: true,
+                composed: true
+              } as CustomEventInit));
         }
         static insert(scriptTag: HTMLScriptElement, cssSelector: string){
             debugger;

@@ -54,11 +54,16 @@
                 }
                 else {
                     const de = document.createElement("div");
-                    //de.setAttribute()
-                    this._target = this.insertAdjacentElement('beforebegin', de);
+                    de.setAttribute('role', 'target');
+                    this._target = this.appendChild(de);
+                    //this._target = this.insertAdjacentElement('beforebegin', de) as HTMLElement;
                 }
             }
             this._renderer(this._input, this._target);
+            this.dispatchEvent(new CustomEvent('dom-change', {
+                bubbles: true,
+                composed: true
+            }));
         }
         static insert(scriptTag, cssSelector) {
             debugger;
