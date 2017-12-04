@@ -143,7 +143,7 @@ So two additional features are defined for eliminating this performance hit:  re
 *derender* is a property of type function.  It takes the rendered (first paint) html (or svg) and "reverse engineers" the markup, by extracting out the data and turning it into a plain old JavaScript object, which when applying the renderer function would produce the same results.  Mathematically, it is the "inverse" of the renderer function.  The result of applying the derender function is broadcast as a custom event with name "init-state-changed," which hosting web components (Polymer being a prime example here) can listen for and bind to.  The markup can look like this:
 
 ```html
-<xtal-method init-state="{{originalTodoList}}">
+<xtal-method input="[[todos]]" init-state="{{originalTodoList}}">
     <script type="module ish">
         export const derenderer = (serverSideGeneratedHtml) =>{
             const todos = [];
@@ -158,6 +158,8 @@ So two additional features are defined for eliminating this performance hit:  re
     </script>
 <xtal-method>
 ```
+
+When *xtal-method* is passed the input object, it checks if it is the same as the init-state object.   If it is, it deletes the init-state property, but doesn't rerender.
 
 ## Template stamping, binding, event listener attching, oh my
 
