@@ -138,7 +138,7 @@ If SSR is used, and the initial state needs to be something that other component
 
 So two additional features are defined for eliminating this performance hit:  reverse-render and the init-state-changed event.
 
-*derender* is a property of type function.  The user specifies a function, which will take the rendered (first paint) html (or svg) and "reverse engineers" the markup, by extracting out the data and turning it into a plain old JavaScript object, which when applying the renderer function would produce the same results.  Mathematically, it is the "inverse" of the renderer function.  The result of applying the derender function is broadcast as a custom event with name "init-state-changed," which hosting web components (Polymer being a prime example here) can listen for and bind to.  The markup can look like this:
+*derender* is a property of type function.  The user specifies a function, which will take the rendered (first paint) html (or svg) and "reverse engineer" the markup, by extracting out the data and turning it into a plain old JavaScript object, which when applying the renderer function would produce the same results.  Mathematically, it is the "inverse" of the renderer function.  The result of applying the derender function is broadcast as a custom event with name "init-state-changed," which hosting web components (Polymer being a prime example here) can listen for and bind to.  The markup can look like this:
 
 ```html
 <xtal-method input="[[todos]]" init-state="{{originalTodoList}}">
@@ -159,7 +159,7 @@ So two additional features are defined for eliminating this performance hit:  re
 
 When *xtal-method* is passed the input object, it checks if it is the same as the init-state object.   If it is, it deletes the init-state property, but doesn't rerender.
 
-Note that if generating html dynamically, this payload will typically be less cacheable.  In the extreme (but quite common) case that it is never cacheable, embedding the derenderer (and renderer) function as part of the HTML payload is counterproductive from a performance point of view.  In this case, it is best to pass in the derenderer remotely from a cacheable resource.
+Note that if generating html dynamically, this payload will typically be less cacheable.  In the extreme (but quite common) case that it is never cacheable, embedding the derenderer (and renderer) function as part of the HTML payload is counterproductive from a performance point of view.  In this case, it is best to pass in the derenderer remotely from a cacheable resource.  Or load the html via fetch (which may or not be as optimal).
 
 ### How does this work, and why should I care?
 
