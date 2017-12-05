@@ -27,6 +27,27 @@
         get renderer() {
             return this._renderer;
         }
+        set derenderer(val) {
+            this._derenderer = val;
+            this.derender();
+        }
+        get derenderer() {
+            return this._derenderer;
+        }
+        set initState(val) {
+            console.log({ initState: val });
+            this._initState = val;
+            this.dispatchEvent(new CustomEvent('init-state-changed', {
+                detail: {
+                    value: val
+                },
+                bubbles: true,
+                composed: true
+            }));
+        }
+        get initState() {
+            return this._initState;
+        }
         set input(val) {
             this._input = val;
             this.render();
@@ -42,11 +63,25 @@
             this.evaluateScriptText();
             //}, 10000);
         }
+        derender() {
+            if (!this._derenderer)
+                return;
+            if (!this._target) {
+                this._target = this.querySelector('[role="target"]');
+                if (!this._target)
+                    return; //add mutation observer?     
+            }
+            this.initState = this._derenderer(this._target);
+        }
         render() {
             if (!this._renderer)
                 return;
             if (!this._input)
                 return;
+            if (this._initState === this._input) {
+                delete this._initState;
+                return;
+            }
             if (!this._target) {
                 const test = this.querySelector('[role="target"]');
                 if (test) {

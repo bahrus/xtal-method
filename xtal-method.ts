@@ -15,13 +15,38 @@
             return 'xtal-method';
         }
 
-        _renderer;
-        set renderer(val: object){
+        _renderer : (formatter, target) => any;
+        set renderer(val: (formatter, target) => any){
             this._renderer = val;
             this.render();
         }
         get renderer(){
             return this._renderer;
+        }
+
+        _derenderer: (element: HTMLElement) => any;
+        set derenderer(val: (element: HTMLElement) => any){
+            this._derenderer = val;
+            this.derender();
+        }
+        get derenderer(){
+            return this._derenderer;
+        }
+
+        _initState: any;
+        set initState(val: any){
+            console.log({initState: val});
+            this._initState = val;
+            this.dispatchEvent(new CustomEvent('init-state-changed', {
+                detail:{
+                    value: val
+                },
+                bubbles: true,
+                composed: true
+              } as CustomEventInit));
+        }
+        get initState(){
+            return this._initState;
         }
 
         _input;
@@ -41,9 +66,21 @@
             //}, 10000);
             
         }
+        derender(){
+            if(!this._derenderer) return;
+            if(!this._target){
+                this._target =  this.querySelector('[role="target"]');
+                if(!this._target) return; //add mutation observer?     
+            }
+            this.initState = this._derenderer(this._target);
+        }
         render(){
             if(!this._renderer) return;
             if(!this._input) return;
+            if(this._initState === this._input){
+                delete this._initState;
+                return;
+            }
             if(!this._target){
                 const test = this.querySelector('[role="target"]');
                 if(test){

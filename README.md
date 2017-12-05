@@ -132,8 +132,6 @@ However, it may be desirable to improve the time to first paint by generating th
 
 In this case, insert the html as another light child within the \<xtal-method\>, starting from a single root tag.  The root tag of that html should have attribute role="target". 
 
-TODO:  
-
 ###  Inverse Functional derendering
 
 If SSR is used, and the initial state needs to be something that other components can bind to, typically this would require sending both the formatted HTML *and* the JSON from which the HTML was derived down the wire.  That's an unfortunate hit on performance.
@@ -161,7 +159,7 @@ So two additional features are defined for eliminating this performance hit:  re
 
 When *xtal-method* is passed the input object, it checks if it is the same as the init-state object.   If it is, it deletes the init-state property, but doesn't rerender.
 
-## Template stamping, binding, event listener attching, oh my
+
 
 
 
