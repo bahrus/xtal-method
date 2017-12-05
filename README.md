@@ -159,6 +159,7 @@ So two additional features are defined for eliminating this performance hit:  re
 
 When *xtal-method* is passed the input object, it checks if it is the same as the init-state object.   If it is, it deletes the init-state property, but doesn't rerender.
 
+Note that if generating html dynamically, this payload will typically be less cacheable.  In the extreme (but quite common) case that it is never cacheable, embedding the derenderer (and renderer) function as part of the HTML payload is counterproductive from a performance point of view.  In this case, it is best to pass in the derenderer remotely from a cacheable resource.
 
 ### How does this work, and why should I care?
 
