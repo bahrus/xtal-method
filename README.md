@@ -2,7 +2,7 @@
 
 The \<xtal-method\> web component is a dependency free custom element that allows one to utilize a functional renderer, like [lit-html](https://alligator.io/web-components/lit-html/) or [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e), without turning the entire application into one giant heap of JavaScript.  
 
-With this component, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The output of the transformation is an adjacent neighbor or child of the element.  So everything is together when inspecting the DOM. 
+With this component, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The output of the transformation becomes a child of the element.  So everything is together when inspecting the DOM. 
 
 Is a custom element required in order to accomplish the localness feature of \<xtal-method\>?  Alas, no, not when support for support for [import.meta](http://2ality.com/2017/11/import-meta.html) becomes widespread.  I think.  Still, the hope is that this custom element will reduce annoying boilerplate code, as we shall see.  
 
@@ -35,7 +35,7 @@ The (tagged) literal template can be defined via a web component light child (in
 
 As the input property of \<xtal-method\> is established and then changes, the renderer will generate the html output, and insert it inside the \<xtal-method\> element instance, or update the same target element as the input property changes.  A "dom-change" event will fire after each DOM update.
 
-The renderer property of \<xtal-method\> takes two arguments -- an object or array which needs to be presented, and a formatter function that generates a DOM (or SVG) string.  The renderer property can be passed to the element instance via traditional binding:
+The renderer property of \<xtal-method\> takes two arguments -- an object or array which needs to be presented, and a formatter function that generates a DOM (or SVG) node tree.  The renderer property can be passed to the element instance via traditional binding:
 
 ```html
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
