@@ -189,18 +189,81 @@ In this case, including the renderer / derendering function inline would be wast
     </html>
 ```
 
-The "cacheableNewsUpdaterEngine.js" is some cacheable script file (or collection of such files) that:
+The "cacheableNewsUpdaterEngine.js" is some cacheable script file (or collection of such files).  There are two actors in this dance:  The cacheableNewsUpdateEngine code (the "Manager") and the xtal-method code (the "Component") 
 
-1)  Loads the custom element for xtal-method (xtal-method.js)
-2)  Defines functions that can render and derender the content of the news feed.
-3)  Finds the xtal-method element by id, and sets the renderer and derender functions, attaches an event listener for init-state-changed.
-4)  The derenderer function examines the original html content, and "derenders" it into a JavaScript array, and that is passed via the init-state-changed event to the listener i step 3.
-5)  Using some polling or server-sent-events, or websockets, the javascript is informed from the server that there's been an update to the top story but no other changes.  Only the top story update is sent down to the browser.  It then updates the initial init-state it received with the new information, and sets the input property of the xtal-method instance.  The renderer efficiently updates only what it needs to.
+1)  Manager:  Loads the javascript for the xtal-method custom element.
+2)  Manager:  Defines functions that can render and derender the content of the news feed.
+3)  Manager: Finds the xtal-method element by id, and sets the renderer and derenderer functions.
+4)  Manager:  Checks if the init-state property is set of the component.  If not, attaches an event listener for init-state-changed.
+5)  Component:  After retrieving the original html, and the derenderer function, the derenderer function examines the original html content, and "derenders" it into a JavaScript array/objects, and that is passed via the init-state-changed event to the listener in step 4.
+6)  Manager:  On receiving the init state,  object is placed in Manager's data store.  
+7)  Manager:  Sets up a subscription so when the manager's data store is updated, it will update the component's input property. 
+8)  Manager: Using some polling or server-sent-events, or websockets, the javascript is informed from the server that there's been an update to the top story but no other changes.  Only the top story update is sent down to the browser.  
+9)  Manager:  Updates its store, which then gets passed to the input property of the component.  
+10)  Component:  The renderer updates the UI (efficiently) based on the new input.
 
 ### Scenario 2.
 
+A cacheable template of static markup needs to insert some dynamic content inside a div, perhaps based on some user input (like filters).  Then we need to update that content a little.  
 
-Note that if generating html dynamically, this payload will typically be less cacheable.  In the extreme (but quite common) case that it is never cacheable, embedding the derenderer (and renderer) function as part of the HTML payload is counterproductive from a performance point of view.  In this case, it is best to pass in the derenderer remotely from a cacheable resource.  Or load the html via fetch (which may or not be as optimal).
+Since the template is cacheable, we can now feel free to inline the renderer and derenderer functions near the element.
+
+But is there really any advantage of having a derenderer?  I.e. in this scenario, is it faster to let the server build the html, and extract out the json from the html using a derenderer, or take the more traditional approach of the server generating json, and the client generaitng the html? 
+
+From a code maintenance point of view, it's almost certainly easier to do it all in the client.  I.e. stick with JSON.  This is probably the biggest explanation for why we had a stampede of logic flowing from the server to the client since 2005, and API's turned pure JSON-based.  Until Twitter [spotted the problem](https://blog.twitter.com/engineering/en_us/a/2012/improving-performance-on-twittercom.html) and later PWA's made us start to rethink this. 
+
+So if we are targeting mobile devices, and performance is of utmost concern, which is better?
+
+The answer would depend on so many scenarios, but I look at it this way:
+
+1)  The server is likely to spend an equivalent amount of time generating either format.  HTML might be a little more verbose than JSON, but then it can be compressed more efficiently, and streamed. So it is probably a wash.
+2)  The CPU on the client will be about the same (just a guess, probably depends on a lot of things).
+3)  Tie breaker:  If the server sends html, we can display that immediately, then yield the thread, then (even in a separate worker thread if we really want to complicate things) apply the inverse function to form the initial state. We only need that inital state if other pieces of the page are binding to it.  So why add extra work if it may not be needed?  We know the HTML is needed, but the initial state might not be. 
+
+So based on this analysis, the advantage seems to go with generating html on the server, at least the first time.
+
+Now, if we do need to bind on the client, and we cause incremental changes to the state, all within the browser, we have an efficient way of updating the UI, with the help of a smart renderer like lit-html or hyperHTML.
+
+But what if we want to get a whole new batch of data from the server?  Does it improve perforance if we get the data in JSON format from the server after the first batch, rather than HTML?
+
+Typically, if we are talking about a list, the data won't change that much.  The whole point of fancy renderers is they outperform setting innerHTML directly, as they can efficiently update only those parts that change.  So here I suspect one would want to switch to the more traditional approach, and retrieve JSON.
+
+To help manage this complex song and dance, xtal-method will expose to its peers whether the content displayed is the original content or not.  This will allow other elemnts to know whether to retrieve HTML vs JSON.
+
+That markup could look as follows:
+
+```html
+<xtal-method>
+    <script type="module ish">
+            scriptTag=>XtalMethod.insert(scriptTag, '#root-lit-html,#lit-html,#lit-html/lib/repeat'); 
+        const todoFormatter = items => html`
+            <h1>My Todos</h1>
+            <ul>
+${repeat(items, item => item.id,  item => html`
+                <li class="${item.done ? 'done' : ''}">${item.value}</li>
+`)}
+            </ul>
+        `;
+        export const renderer = (list, target) => render(todoFormatter(list), target);
+        export const derenderer = el =>{
+            const todos = [];
+            el.querySelectorAll('li').forEach(element => {
+            todos.push({
+                id: element.id,
+                value: element.innerText
+            });
+            });
+            return todos;
+        }
+    </script>
+    <xtal-fetch fetch href="api/myTodos" role="target" as="text" insert-results>
+    </xtal-fetch>
+</xtal-method>
+```  
+
+What this example illustrates, though, is that we need to know *when* to do the derender.  One could use a mutation observer, but I think it is better to rely on a specific event from the custom element that retrieves the html.  It seems that Polymer has standardized on ["dom-change"](https://github.com/Polymer/polymer/blob/master/lib/elements/dom-repeat.html#L522) as the name for this event.  So the derenderer function will apply whenever it encounters the dom change event.
+
+Now what if we want to get fresh data from the backend?  Do we retrieve a new html formatted 
 
 ### How does this work, and why should I care?
 
