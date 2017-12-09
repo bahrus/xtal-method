@@ -24,6 +24,14 @@
             return this._renderer;
         }
 
+        _upgradeProperty(prop) {
+            if (this.hasOwnProperty(prop)) {
+                let value = this[prop];
+                delete this[prop];
+                this[prop] = value;
+            }
+        }
+
         _derenderer: (element: HTMLElement) => any;
         set derenderer(val: (element: HTMLElement) => any){
             this._derenderer = val;
@@ -60,12 +68,14 @@
         disconnectedCallback() {
             //this._domObserver.disconnect();
         }
+
         connectedCallback() {
-            //setTimeout(() =>{
-                this.evaluateScriptText();
-            //}, 10000);
-            
+            this._upgradeProperty('input');
+            this._upgradeProperty('renderer');
+            this._upgradeProperty('derenderer');
+            this.evaluateScriptText();
         }
+
         derender(){
             if(!this._derenderer) return;
             if(!this._target){
@@ -98,9 +108,6 @@
                 bubbles: true,
                 composed: true
               } as CustomEventInit));
-        }
-        static insert(scriptTag: HTMLScriptElement, cssSelector: string){
-            debugger;
         }
         evaluateScriptText(){
             const templateTag = this.querySelector('template') as HTMLTemplateElement;

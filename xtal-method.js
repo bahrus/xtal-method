@@ -27,6 +27,13 @@
         get renderer() {
             return this._renderer;
         }
+        _upgradeProperty(prop) {
+            if (this.hasOwnProperty(prop)) {
+                let value = this[prop];
+                delete this[prop];
+                this[prop] = value;
+            }
+        }
         set derenderer(val) {
             this._derenderer = val;
             this.derender();
@@ -59,9 +66,10 @@
             //this._domObserver.disconnect();
         }
         connectedCallback() {
-            //setTimeout(() =>{
+            this._upgradeProperty('input');
+            this._upgradeProperty('renderer');
+            this._upgradeProperty('derenderer');
             this.evaluateScriptText();
-            //}, 10000);
         }
         derender() {
             if (!this._derenderer)
@@ -99,9 +107,6 @@
                 bubbles: true,
                 composed: true
             }));
-        }
-        static insert(scriptTag, cssSelector) {
-            debugger;
         }
         evaluateScriptText() {
             const templateTag = this.querySelector('template');
