@@ -65,6 +65,22 @@
                 </script>
             </json-merge>
             <xtal-method input="[[todos]]">
+              <script type="module ish">
+                const todoFormatter = items => `
+                Generated with no helper library:<br>
+                <ul>
+${items.map(item => `
+                      <li>${item.value}</li>
+`).join('')}
+                </ul>
+                `
+                export const renderer = (list, target) => {
+                  target.innerHTML = todoFormatter(list);
+                }
+              </script>
+
+            </xtal-method>
+            <xtal-method input="[[todos]]">
               <!-- "ish" is added in type attribute below to make the script inactive, but preserve
               syntax highlighting in VS Code (at least)-->
               <script type="module ish">
@@ -72,9 +88,9 @@
                     const todoFormatter = items => html`
                       <h1>My Todos</h1>
                         <ul>
-                                                                                    ${repeat(items, item => item.id,  item => html`
+${repeat(items, item => item.id,  item => html`
                           <li class="${item.done ? 'done' : ''}">${item.value}</li>
-                                                                                    `)}
+`)}
                         </ul>
                     `;
                     export const renderer = (list, target) => render(todoFormatter(list), target);
