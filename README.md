@@ -127,7 +127,7 @@ To share fragments of Javascript, define each shareable fragment within a script
   </script>
 ```
 
-Placing these in one central location, perhaps in the header of index.html (if applicable) seems like a good place..  
+Placing these in one central location, perhaps in the header of index.html (if applicable) seems like a pattern to adopt.  
 
 And then reference it as follows:
 
@@ -150,7 +150,7 @@ And then reference it as follows:
 </xtal-method>
 ```
 
-Note the static method call:  Xtal.writeinsertLines.  This inserts the inner text of the script tags with the id's _root_lit_html, _lit_html, _lit_repeat defined in the header above.
+Note the static method call:  Xtal.insert.  This inserts the inner text of the script tags with the id's _root_lit_html, _lit_html, _lit_repeat defined in the header above.
 
 ## Server-side rendering of initial paint
 
@@ -295,7 +295,7 @@ What this example illustrates, though, is that we need to know *when* to do the 
 
 ### How does this work, and why should I care?
 
-Because this component manipulates the text of the script tag a bit, and does an eval, there is a slight performance hit. The performance hit from eval seems [suprisingly small](https://jsperf.com/function-vs-constructor-vs-eval).  Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
+Because this component manipulates the text of the script tag a bit, and then gets inserted into the document.head element, there is a slight performance hit. Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code prior to activating it. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
 
 Hopefully the benefits in terms of developer productivity outweighs the performance cost (and of course, this needs to be compared to other ways of using functional renderers).
 
