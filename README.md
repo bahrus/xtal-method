@@ -160,6 +160,16 @@ However, it may be desirable to improve the time to first paint by generating th
 
 In this case, during design time, or when dynamically generating the HTML document, insert the initial html as another inner element within the \<xtal-method\>, starting from a single root tag.  The root tag of that html should have attribute role="target" (and doesn't have to be a div). 
 
+### How does this work, and why should I care?
+
+Because this component manipulates the text of the script tag a bit, and then  does an eval, there is a slight performance hit. The performance hit from eval seems [surprisingly small](https://jsperf.com/function-vs-constructor-vs-eval).  Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
+
+Hopefully the benefits in terms of developer productivity outweigh the performance cost (and of course, this needs to be compared to other ways of using functional renderers).
+
+Still, if this performance is a concern, a build process could be established to do that string manipulating during the build / optimization process. Anyway, such a process is also needed to support downstream browsers that don't support dynamic import or ES6. 
+
+More on this topic to come. 
+
 ###  Inverse Functional derendering
 
 If SSR is used, and the initial state needs to be something that other components can bind to, typically this would require sending both the formatted HTML *and* the JSON from which the HTML was derived down the wire.  That's an unfortunate hit on performance.
@@ -295,15 +305,7 @@ ${repeat(items, item => item.id,  item => html`
 What this example illustrates, though, is that we need to know *when* to do the derender.  One could use a mutation observer, but I think it is better to rely on a specific event from the custom element that retrieves the html.  It seems that Polymer has standardized on ["dom-change"](https://github.com/Polymer/polymer/blob/master/lib/elements/dom-repeat.html#L522) as the name for this event.  So the derenderer function will apply whenever it encounters the dom change event.
  
 
-### How does this work, and why should I care?
 
-Because this component manipulates the text of the script tag a bit, and then gets inserted into the document.head element and does an eval, there is a slight performance hit. The performance hit from eval seems [surprisingly small](https://jsperf.com/function-vs-constructor-vs-eval).  Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
-
-Hopefully the benefits in terms of developer productivity outweigh the performance cost (and of course, this needs to be compared to other ways of using functional renderers).
-
-Still, if this performance is a concern, a build process could be established to do that string manipulating during the build / optimization process. Anyway, such a process is also needed to support downstream browsers that don't support dynamic import or ES6. 
-
-More on this topic to come. 
 
 
 ## Install the Polymer-CLI
