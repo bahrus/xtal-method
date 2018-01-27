@@ -1,15 +1,19 @@
 # \<xtal-method\>
 
-The \<xtal-method\> is a helper element web component, similar in concept to \<dom-if\> or \<dom-repeat\>, but where the expression syntax has the full breadth of ES6+ JavaScript. It allows one to define the template markup based on (tagged) literal templates, and is open ended enough to support any optimizing library of your choosing, like [lit-html](https://alligator.io/web-components/lit-html/) or [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e).
+A significant plurality of the web development community is enamored with the concept of bringing the power of  [server-side templating engines](https://www.w3schools.com/asp/razor_cs_loops.asp), combined with functional concepts to the client.  But which of the competing templating engines to use?  I like the approach adopted by [Skate](https://skatejs.netlify.com/)
 
-With this component, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The output of the transformation becomes a child of the element.  So everything is together when inspecting the DOM.   
+>For this reason, Skate provides a hook to inject renderers for any view library
+
+\<xtal-method\> adopts the same philosophy, but sets its aim much lower.  It views itself as a helper element web component, similar in concept to \<dom-if\> or \<dom-repeat\>, but where the expression syntax has the full breadth of ES6+ JavaScript (which doesn't currently include JSX, but does include the letter h). It allows you to define the template markup based on (tagged) literal templates.  You will end up with less semantic html output than with SkateJS, less encapsulation but 1) there is less ceremony required to add a dynamic snippet of markup, and 2) It integrates more seamlessly with other html markup.
+
+With \<xtal-method\>, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The output of the transformation becomes a child of the element.  So everything is together when inspecting the DOM.   
 
 The (tagged) literal template can be defined via a web component light child (innerHTML of the element):
 
 ```html
             <xtal-method input="[[todos]]">
               <script type="module ish">
-                const todoFormatter = items => `
+                const todoFormatterVulerableToSecurityHacks = items => `
                 Generated with no helper library:<br>
                 <ul>
 ${items.map(item => `
@@ -18,14 +22,18 @@ ${items.map(item => `
                 </ul>
                 `
                 export const renderer = (list, target) => {
-                  target.innerHTML = todoFormatter(list);
+                  target.innerHTML = todoFormatterVulerableToSecurityHacks(list);
                 }
               </script>
 
             </xtal-method>
 ```
 
-If the data will change frequently, or the generated HTML contains custom elements that need properties passed, thus making the benifits of loading a small optimizing library like lit-html or hyperHTML worth it, the script markup can include asynchronous dynamic imports:
+**NB:  Code like what is shown above is quite vulnerable to hacking, especially if you can't trust the source of the data in your todo list.  If the todo list changes frequently, performance will be sub optimal, at least with current browsers, and it wouldn't integrate nicely with modern binding frameworks.  If these features aren't critical at first (e.g. during the initial prototyping), then it should be possible to switch to one of the more robust solutions when the time is right (ideally before it goes to production.)
+
+But almost certainly you will want to use a library where such issues are thought through, like [lit-html](https://alligator.io/web-components/lit-html/) or [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e).  
+
+For example let's see how we can use lit-html to render the to-do list example from the lit-html link above.
 
 ```html
 <xtal-method input="[[todos]]">
@@ -49,12 +57,11 @@ ${repeat(items, item => item.id,  item => html`
 ```
 
 
-
 \<xtal-method\> only has two key, required properties for anything to happen:  input and renderer.
 
-As the input property of \<xtal-method\> is established and then changes, the renderer will generate the html output, and insert it inside the \<xtal-method\> element instance, or update the same target element as the input property changes.  A "dom-change" event will fire after each DOM update.
+As the input property of \<xtal-method\> is established and then changes, the renderer generates the html output, and inserts it inside the \<xtal-method\> element instance, or updates the same target element as the input property changes.  A "dom-change" event fires after each DOM update.
 
-The renderer property of \<xtal-method\> takes two arguments -- an object or array which needs to be presented, and a formatter function that generates a DOM (or SVG) node tree.  The renderer property can be passed to the element instance via traditional binding:
+The renderer property of \<xtal-method\> is of type function, a function that takes two arguments -- an object or array which needs to be presented, and a formatter function that generates a DOM (or SVG) node tree.  The renderer property can be passed to the element instance via traditional binding:
 
 ```html
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
@@ -62,7 +69,7 @@ The renderer property of \<xtal-method\> takes two arguments -- an object or arr
 
 This will work just fine, except it will force the developer to go on a scavenger hunt to find where the formatter was set.  The option to define the formatter inline, as shown throughout this discussion, is meant to eliminate that nuisance.
 
-The script tag inside the \<xtal-method\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the \<xtal-method\> element instance.  So you could, if you want, not just specify the renderer property, but you could also set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
+The script tag inside the \<xtal-method\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the \<xtal-method\> element instance.  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
 ```html
 <xtal-method>
@@ -109,31 +116,33 @@ In particular, the import statements will be the first candidate for sharing.
 To share fragments of Javascript, define each shareable fragment within a script tag with a unique id:
 
 ```html
-  <script type="module ish" id="root-lit-html">
+  <script type="module ish" id="_root_lit_html">
     const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
   </script>
-  <script type="module ish" id="lit-html">
+  <script type="module ish" id="_lit_html">
       const { html, render } = await import(root + 'lit-html.js');
   </script>
-  <script type="module ish" id="lit-html/lib/repeat">
+  <script type="module ish" id="_lit_repeat">
     const { repeat } = await import(root + 'lib/repeat.js');
   </script>
 ```
 
-Placing these in one central location, perhaps in the header of index.html (if applicable) seems like a good place to put this.  
+Placing these in one central location, perhaps in the header of index.html (if applicable) seems like a good place..  
 
 And then reference it as follows:
 
 ```html
 <xtal-method input="[[todos]]">
     <script type="module ish">
-        scriptTag=>XtalMethod.insert(scriptTag, '#root-lit-html,#lit-html,#lit-html/lib/repeat'); //https://github.com/mishoo/UglifyJS2/issues/671
+        Xtal.insert(_root_lit_html, _lit_html, _lit_repeat);
         const todoFormatter = items => html`
             <h1>My Todos</h1>
             <ul>
-                                                                        ${repeat(items, item => item.id,  item => html`
-                <li class="${item.done ? 'done' : ''}">${item.value}</li>
-                                                                        `)}
+                                                            ${repeat(items, item => item.id,  item => html`
+                <li class="${item.done ? 'done' : ''}">
+                    ${item.value}
+                </li>
+                                                            `)}
             </ul>
         `;
         export const renderer = (list, target) => render(todoFormatter(list), target);
@@ -141,7 +150,7 @@ And then reference it as follows:
 </xtal-method>
 ```
 
-The second argument, of type string, of 'xtalMethod.insert(),' is an extremely limited pseudo css selector.  To specify multiple script tags by id, use the css comma delimiter.  Fragments will be inserted in the order of the list.
+Note the static method call:  Xtal.writeinsertLines.  This inserts the inner text of the script tags with the id's _root_lit_html, _lit_html, _lit_repeat defined in the header above.
 
 ## Server-side rendering of initial paint
 
