@@ -1,14 +1,14 @@
 # \<xtal-method\>
 
-A significant plurality of the web development community is enamored with the concept of bringing the power of  [server-side templating engines](https://www.w3schools.com/asp/razor_cs_loops.asp), combined with functional concepts to the client.  But which of the competing templating engines to use?  I like the approach adopted by [Skate](https://skatejs.netlify.com/)
+A significant subset of the web development community is enamored with the concept of bringing the power of  [server-side templating engines](https://www.w3schools.com/asp/razor_cs_loops.asp), combined with functional concepts, to the client.  But which of the competing templating engines to use?  I like the approach adopted by [Skate](https://skatejs.netlify.com/)
 
 >For this reason, Skate provides a hook to inject renderers for any view library
 
-\<xtal-method\> adopts the same philosophy, but sets its aim much lower.  It views itself as a helper element web component, similar in concept to \<dom-if\> or \<dom-repeat\>, but where the expression syntax has the full breadth of ES6+ JavaScript (which doesn't currently include JSX, but does include the letter h). It allows you to define the template markup based on (tagged) literal templates.  You will end up with less semantic html output than with SkateJS, less encapsulation but 1) there is less ceremony required to add a dynamic snippet of markup, and 2) It integrates more seamlessly with other html markup.
+\<xtal-method\> adopts the same philosophy, but sets its aim much lower (and is ultimately helping with a different problem).  It views itself as a helper element web component, similar in concept to \<dom-if\> or \<dom-repeat\> or \<iron-list\>, but where the expression syntax has the full breadth of ES6+ JavaScript (which doesn't currently include JSX, but does include the letter h). For example, it allows you to define the markup based on (tagged) literal templates.   
 
 With \<xtal-method\>, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The output of the transformation becomes a child of the element.  So everything is together when inspecting the DOM.   
 
-The (tagged) literal template can be defined via a web component light child (innerHTML of the element):
+For example, here we see a tagged literal template, with no helper library, being used to set the innerHTML of the element:
 
 ```html
             <xtal-method input="[[todos]]">
@@ -29,9 +29,9 @@ ${items.map(item => `
             </xtal-method>
 ```
 
-**NB:  Code like what is shown above is quite vulnerable to hacking, especially if you can't trust the source of the data in your todo list.  If the todo list changes frequently, performance will be sub optimal, at least with current browsers, and it wouldn't integrate nicely with modern binding frameworks.  If these features aren't critical at first (e.g. during the initial prototyping), then it should be possible to switch to one of the more robust solutions when the time is right (ideally before it goes to production.)
+**NB**:  Code like what is shown above is quite vulnerable to hacking, especially if you can't trust the source of the data in your todo list.  If the todo list changes frequently, performance will be sub optimal, at least with current browsers, and it wouldn't integrate nicely with modern binding frameworks.  If these features aren't critical at first (e.g. during the initial prototyping), then it should be possible to switch to one of the more robust solutions mentioned below when the time is right (ideally before it goes to production) witout many changes.
 
-But almost certainly you will want to use a library where such issues are thought through, like [lit-html](https://alligator.io/web-components/lit-html/) or [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e).  
+Almost certainly you will want to use a library where such issues are thought through, like [lit-html](https://alligator.io/web-components/lit-html/) or (hopefully) [hyperHTML](https://medium.com/@WebReflection/hyperhtml-a-virtual-dom-alternative-279db455ee0e).  
 
 For example let's see how we can use lit-html to render the to-do list example from the lit-html link above.
 
@@ -67,7 +67,7 @@ The renderer property of \<xtal-method\> is of type function, a function that ta
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
 ```
 
-This will work just fine, except it will force the developer to go on a scavenger hunt to find where the formatter was set.  The option to define the formatter inline, as shown throughout this discussion, is meant to eliminate that nuisance.
+This will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the formatter was set.  The option to define the formatter inline, as shown throughout this discussion, is meant to eliminate that nuisance.
 
 The script tag inside the \<xtal-method\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the \<xtal-method\> element instance.  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
@@ -101,7 +101,7 @@ Another approach to server-side generated content is discussed farther down.
 
 ## Syntax Shenanigans
 
-It is highly desired that the contents of the script tag **not** be processed by the browser before being manipulated by the \<xtal-method\> as it is a waste of processing and a potential source of unintended side effects (like generating an error in the console when unexpected syntax is encountered).  There are a number of ways this can be done, with the pro's and con's listed below:
+It is highly desired that the contents of the script tag **not** be processed by the browser before being manipulated by \<xtal-method\>, as it is a waste of processing and a potential source of unintended side effects (like generating an error in the console when unexpected syntax is encountered).  There are a number of ways this can be done, with the pro's and con's listed below:
 
 1. Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative-ish), and I use this tag repeatedly, this immediately poses a problem in my mind, which is why the following alternatives are listed (and used in the demo).
 2. Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code / GitHub / WebComponents site stops providing syntax highlighting / basic linting when doing this.  More sophisticated editors, like WebStorm, can be trained to recognize custom attributes via a feature called language injection.  Of course a VS code extension could also be built, but that seems like overkill.  Anyway, despite all these negatives, this solution should work, at least, with a high degree of confidence.
@@ -158,7 +158,7 @@ By default, \<xtal-method\> dynamically creates a div element with attribute rol
 
 However, it may be desirable to improve the time to first paint by generating the initial HTML on the server, and not providing any input object initially, until user interaction requires an update.
 
-In this case, during design time, or when dynamically generating the HTML document, insert the initial html as another light child within the \<xtal-method\>, starting from a single root tag.  The root tag of that html should have attribute role="target" (and doesn't have to be a div). 
+In this case, during design time, or when dynamically generating the HTML document, insert the initial html as another inner element within the \<xtal-method\>, starting from a single root tag.  The root tag of that html should have attribute role="target" (and doesn't have to be a div). 
 
 ###  Inverse Functional derendering
 
@@ -187,11 +187,13 @@ So two additional features are defined for eliminating this performance hit:  re
 
 When *xtal-method* is passed the input object, it checks if it is the same as the init-state object.   If it is, it deletes the init-state property, but doesn't rerender.
 
+## Esoteric arm-chair musings.  Take with a grain of salt, i.e. ignore 
+
 Be aware, however, that there are two distinct ways this feature can be used, and the developer should have a very clear view of what scenario applies to them. 
 
 ### Scenario 1.  Non cacheable index.html
 
-I suspect this scenario is rare in practice, but who knows?  Let's say you are a news site, like CNN, highly fluid content, maybe you insist 99% of the content should work without JavaScript.  (They don't really do this.  The stories are in fact encoded in JSON data, not directly in the html.  If you disable JavaScript, you'll see what I mean.  On the other hand, Fox News seems to be 100% HTML) It might stand to reason, then, that the root url should map to a non cacheable index.html, which isn't a file, but a dynamic stream generated by something like node/express or asp.net or a servlet or php or ... you get the idea.  
+I suspect this scenario is rare in practice, but who knows?  Let's say you are a news site, like CNN, highly fluid content, maybe you insist 99% of the content should work without JavaScript.  (They don't really do this.  The stories are in fact encoded in JSON data, not directly in the html.  If you disable JavaScript, you'll see what I mean.  On the other hand, Fox News seems to be 100% HTML.  Are conservatives more progressive?) It might stand to reason, then, that the root url should map to a non cacheable index.html, which isn't a file, but a dynamic stream generated by something like node/express or asp.net or a servlet or php or ... you get the idea.  
 
 Suppose now that you want to have the ability to update certain headlines, or photo captions on the fly.  This would mean that an efficient (re)rendering function / derendering function may be useful.  
 
@@ -264,7 +266,7 @@ That markup could look as follows:
 ```html
 <xtal-method>
     <script type="module ish">
-            scriptTag=>XtalMethod.insert(scriptTag, '#root-lit-html,#lit-html,#lit-html/lib/repeat'); 
+        XtalMethod.insert(_root_lit_html, _lit_html, _lit_repeat); 
         const todoFormatter = items => html`
             <h1>My Todos</h1>
             <ul>
@@ -277,10 +279,10 @@ ${repeat(items, item => item.id,  item => html`
         export const derenderer = el =>{
             const todos = [];
             el.querySelectorAll('li').forEach(element => {
-            todos.push({
-                id: element.id,
-                value: element.innerText
-            });
+                todos.push({
+                    id: element.id,
+                    value: element.innerText
+                });
             });
             return todos;
         }
@@ -295,7 +297,7 @@ What this example illustrates, though, is that we need to know *when* to do the 
 
 ### How does this work, and why should I care?
 
-Because this component manipulates the text of the script tag a bit, and then gets inserted into the document.head element, there is a slight performance hit. Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code prior to activating it. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
+Because this component manipulates the text of the script tag a bit, and then gets inserted into the document.head element and does an eval, there is a slight performance hit. The performance hit from eval seems [suprisingly small](https://jsperf.com/function-vs-constructor-vs-eval).  Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
 
 Hopefully the benefits in terms of developer productivity outweighs the performance cost (and of course, this needs to be compared to other ways of using functional renderers).
 
