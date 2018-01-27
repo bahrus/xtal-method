@@ -133,7 +133,7 @@
         //     return target.split(search).join(replacement);
         // }
         //regExp = /(.*)export(\s+)const(\s+)[a-zA-Z]+(\s*)=/g;
-        insertFragmentRegExp = /scriptTag=>XtalMethod.insert\(scriptTag,(.*)\);/g;
+        insertFragmentRegExp = /XtalMethod.insert\((.*)\);/g;
         applyScript(scriptTag: HTMLScriptElement){
             const innerText = scriptTag.innerText;
             if (innerText === this._previousEvaluatedText) return;
@@ -150,7 +150,7 @@
                 if(idx % 2 === 0) return val;
                 let newText = '';
                 const ids = val.split(',').forEach(id =>{
-                    const scriptInclude = document.getElementById(id.replace("'", '').replace('#', '').trim());
+                    const scriptInclude = window[id.trim()];
                     if(scriptInclude){
                         newText += scriptInclude.innerHTML;
                     }else{

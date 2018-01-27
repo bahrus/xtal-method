@@ -15,7 +15,7 @@
             //     return target.split(search).join(replacement);
             // }
             //regExp = /(.*)export(\s+)const(\s+)[a-zA-Z]+(\s*)=/g;
-            this.insertFragmentRegExp = /scriptTag=>XtalMethod.insert\(scriptTag,(.*)\);/g;
+            this.insertFragmentRegExp = /XtalMethod.insert\((.*)\);/g;
         }
         static get is() {
             return 'xtal-method';
@@ -144,7 +144,7 @@
                     return val;
                 let newText = '';
                 const ids = val.split(',').forEach(id => {
-                    const scriptInclude = document.getElementById(id.replace("'", '').replace('#', '').trim());
+                    const scriptInclude = window[id.trim()];
                     if (scriptInclude) {
                         newText += scriptInclude.innerHTML;
                     }

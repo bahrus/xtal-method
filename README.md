@@ -134,7 +134,7 @@ And then reference it as follows:
 ```html
 <xtal-method input="[[todos]]">
     <script type="module ish">
-        Xtal.insert(_root_lit_html, _lit_html, _lit_repeat);
+        XtalMethod.insert(_root_lit_html, _lit_html, _lit_repeat);
         const todoFormatter = items => html`
             <h1>My Todos</h1>
             <ul>
@@ -297,9 +297,9 @@ What this example illustrates, though, is that we need to know *when* to do the 
 
 ### How does this work, and why should I care?
 
-Because this component manipulates the text of the script tag a bit, and then gets inserted into the document.head element and does an eval, there is a slight performance hit. The performance hit from eval seems [suprisingly small](https://jsperf.com/function-vs-constructor-vs-eval).  Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
+Because this component manipulates the text of the script tag a bit, and then gets inserted into the document.head element and does an eval, there is a slight performance hit. The performance hit from eval seems [surprisingly small](https://jsperf.com/function-vs-constructor-vs-eval).  Perhaps the more significant (but still slight) overhead is in applying regular expression / string searches / replaces on the JavaScript code. Note that we are *not* doing any full parsing of the JavaScript.  We're leaving that for the browser.  
 
-Hopefully the benefits in terms of developer productivity outweighs the performance cost (and of course, this needs to be compared to other ways of using functional renderers).
+Hopefully the benefits in terms of developer productivity outweigh the performance cost (and of course, this needs to be compared to other ways of using functional renderers).
 
 Still, if this performance is a concern, a build process could be established to do that string manipulating during the build / optimization process. Anyway, such a process is also needed to support downstream browsers that don't support dynamic import or ES6. 
 
