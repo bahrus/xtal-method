@@ -34,7 +34,8 @@
   <div class="vertical-section-container centered">
     <h3>Basic xtal-method demo</h3>
     <p>NB: Demo only works in browsers that support
-      <a href="https://developers.google.com/web/updates/2017/11/dynamic-import">dynamic imports</a> </p>
+      <a href="https://developers.google.com/web/updates/2017/11/dynamic-import">dynamic imports</a>
+    </p>
     <demo-snippet>
 
       <template>
@@ -105,12 +106,12 @@ ${repeat(items, item => item.id,  item => html`
                       return todos;
                     }
                 </script>
-                <div role="target">
-                    <h1>My Todos</h1>
-                  <ul>
-                    <li id="1">Get the broom</li>
-                  </ul>
-                </div>
+              <div role="target">
+                <h1>My Todos</h1>
+                <ul>
+                  <li id="1">Get the broom</li>
+                </ul>
+              </div>
             </xtal-method>
           </template>
         </dom-bind>

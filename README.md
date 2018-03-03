@@ -1,6 +1,6 @@
 # \<xtal-method\>
 
-A significant subset of the web development community is enamored with the concept of bringing the power of  [server-side templating engines](https://www.w3schools.com/asp/razor_cs_loops.asp), combined with functional concepts, to the client.  But which of the competing templating engines to use?  I like the approach adopted by [Skate](https://skatejs.netlify.com/)
+A significant subset of the web development community is enamored with the concept of bringing the power of  [server-side templating engines](https://www.w3schools.com/asp/razor_cs_loops.asp), combined with [functional concepts[(http://fxsl.sourceforge.net/articles/FuncProg/Functional%20Programming.html), to the client.  But which of the competing templating engines to use?  I like the approach adopted by [Skate](https://skatejs.netlify.com/)
 
 >For this reason, Skate provides a hook to inject renderers for any view library
 
@@ -8,7 +8,7 @@ A significant subset of the web development community is enamored with the conce
 
 With \<xtal-method\>, one creates a localized inline connection between an input JavaScript object and a functional renderer directly in the markup.  The output of the transformation becomes a child of the element.  So everything is together when inspecting the DOM.   
 
-For example, here we see a tagged literal template, with no helper library, being used to set the innerHTML of the element:
+For example, here we see an untagged literal template, with no helper library, being used to set the innerHTML of the element:
 
 ```html
             <xtal-method input="[[todos]]">
@@ -67,7 +67,7 @@ The renderer property of \<xtal-method\> is of type function, a function that ta
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
 ```
 
-This will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the formatter was set.  The option to define the formatter inline, as shown throughout this discussion, is meant to eliminate that nuisance.
+This will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the renderer was set.  The option to define the formatter inline, as shown throughout this discussion, is meant to eliminate that nuisance.
 
 The script tag inside the \<xtal-method\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the \<xtal-method\> element instance.  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
@@ -101,7 +101,7 @@ Another approach to server-side generated content is discussed farther down.
 
 ## Syntax Shenanigans
 
-It is highly desired that the contents of the script tag **not** be processed by the browser before being manipulated by \<xtal-method\>, as it is a waste of processing and a potential source of unintended side effects (like generating an error in the console when unexpected syntax is encountered).  There are a number of ways this can be done, with the pro's and con's listed below:
+It is highly desirable that the contents of the script tag **not** be processed by the browser before being manipulated by \<xtal-method\>, as it is a waste of processing and a potential source of unintended side effects (like generating an error in the console when unexpected syntax is encountered).  There are a number of ways this can be done, with the pro's and con's listed below:
 
 1. Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative-ish), and I use this tag repeatedly, this immediately poses a problem in my mind, which is why the following alternatives are listed (and used in the demo).
 2. Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code / GitHub / WebComponents site stops providing syntax highlighting / basic linting when doing this.  More sophisticated editors, like WebStorm, can be trained to recognize custom attributes via a feature called language injection.  Of course a VS code extension could also be built, but that seems like overkill.  Anyway, despite all these negatives, this solution should work, at least, with a high degree of confidence.
