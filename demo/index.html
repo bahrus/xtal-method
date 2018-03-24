@@ -10,6 +10,7 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script async src="https://cdn.jsdelivr.net/npm/xtal-json-merge@0.1.1/build/ES6/json-merge.js"></script>
   <script src="../xtal-method.js"></script>
+  <script src="../xtal-import-export.js"></script>
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <!-- <link rel="import" href="../../polymer/lib/elements/dom-bind.html"> -->
@@ -66,7 +67,8 @@
                 </script>
             </json-merge>
             <xtal-method input="[[todos]]">
-              <script type="module ish">
+              <xtal-import-export>
+                <script type="module ish">
                 const todoFormatter = items => `
                 Generated with no helper library (but this is a security risk):<br>
                 <ul>
@@ -79,13 +81,14 @@ ${items.map(item => `
                   target.innerHTML = todoFormatter(list);
                 }
               </script>
-
+              </xtal-import-export>
             </xtal-method>
             <xtal-method input="[[todos]]">
+              <xtal-import-export>
               <!-- "ish" is added in type attribute below to make the script inactive, but preserve
               syntax highlighting in VS Code (at least)-->
               <script type="module ish">
-                    XtalMethod.insert(_root_lit_html, _lit_html, _lit_repeat);
+                    XtalIMEX.insert(_root_lit_html, _lit_html, _lit_repeat);
                     const todoFormatter = items => html`
                       <h1>My Todos</h1>
                         <ul>
@@ -106,6 +109,7 @@ ${repeat(items, item => item.id,  item => html`
                       return todos;
                     }
                 </script>
+                </xtal-import-export>
               <div role="target">
                 <h1>My Todos</h1>
                 <ul>

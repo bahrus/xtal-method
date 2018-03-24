@@ -1,0 +1,7 @@
+(function(){const a=document.currentScript.dataset.as,b=a?a:'xtal-import-export';if(!customElements.get(b)){class a extends HTMLElement{constructor(){super(...arguments),this.insertFragmentRegExp=/XtalIMEX.insert\((.*)\);/g}evaluateScriptText(){const a=this.querySelector('template');let b;a&&(b=document.importNode(a.content,!0));let c=this.querySelector('script');return!c&&b&&(c=b.querySelector('script')),c?void this.applyScript(c):void console.error('No script tag  found to apply.')}applyScript(a){const b=a.innerText;if(b===this._previousEvaluatedText)return;this._previousEvaluatedText=b;const c=b.split(this.insertFragmentRegExp),d=c.map((a,b)=>{if(0===b%2)return a;let c='';a.split(',').forEach((a)=>{const b=window[a.trim()];b?c+=b.innerHTML:console.error('script tag with selector '+a+' not found')});return c}),e=d.join(''),f=e.split('export const ');let g=0;for(let b=1,c=f.length;b<c;b++){const a=f[b],c=a.indexOf('='),d=a.substr(0,c).trim();f[b]='const '+d+' = exportconst.'+d+' = '+a.substr(c+1)}const h=f.join(''),i=`[
+            async function () {
+                const exportconst = {};
+                ${h}
+                return exportconst;
+            }
+            ]`,j=eval(i),k=this.parentElement,l=j[0]().then((a)=>{Object.assign(k,a)}).catch((a)=>{throw a})}connectedCallback(){this.evaluateScriptText()}}customElements.define(b,a)}})();
