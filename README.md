@@ -9,7 +9,7 @@ A significant subset of the web development community is enamored with the conce
 xtal-method is a ~670B gzipped and minified, dependency free web component.  
 
 With \<xtal-method\>, one pairs up  an input JavaScript object with a functional renderer, and their offspring is HTML (or SVG).  The output of the transformation becomes a child of the element.
-  
+
 \<xtal-method\> only has two key, required properties for anything to happen:  input and renderer.
 
 As the input property of \<xtal-method\> is established and then changes, the renderer generates the html output, and inserts it inside the \<xtal-method\> element instance, or updates the same target element as the input property changes.  A "dom-change" event fires after each DOM update.
@@ -48,6 +48,7 @@ To define your alternative name (globally), add the attribute data-as to the scr
 </head>
 ```
 
+Keeping the markup simple, as shown above, where the renderer function is passed in as a property, will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the renderer was set.  The option to define the formatter inline, as shown below, is meant to eliminate that nuisance.
 
 ## Inline Markup
 
@@ -106,7 +107,7 @@ ${repeat(items, item => item.id,  item => html`
                 
 ```
 
-This will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the renderer was set.  The option to define the formatter inline, as shown throughout this discussion, is meant to eliminate that nuisance.
+
 
 The script tag inside the \<xtal-import-export\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the parent elment instance,  \<xtal-method\> in this case.  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
