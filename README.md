@@ -8,7 +8,8 @@ A significant subset of the web development community is enamored with the conce
 
 xtal-method is a ~670B gzipped and minified, dependency free web component.  
 
-With \<xtal-method\>, one pairs up  an input JavaScript object with a functional renderer, and their offspring is HTML (or SVB).  The output of the transformation becomes a child of the element.  
+With \<xtal-method\>, one pairs up  an input JavaScript object with a functional renderer, and their offspring is HTML (or SVG).  The output of the transformation becomes a child of the element.
+  
 \<xtal-method\> only has two key, required properties for anything to happen:  input and renderer.
 
 As the input property of \<xtal-method\> is established and then changes, the renderer generates the html output, and inserts it inside the \<xtal-method\> element instance, or updates the same target element as the input property changes.  A "dom-change" event fires after each DOM update.
