@@ -40,22 +40,27 @@ Or maybe you want to code with attitude:
 
 As long as you stick to lisp-case, you are good!
 
-To define your alternative name (globally), add the attribute data-as to the script reference:
+Ideally, with ES6 Imports, you could just import this js, and extend it:
 
-```html
-<head>
-    <script src="path/to/xtal-method" data-as="love-me-render"></script>
-</head>
+```JavaScript
+customElements.define('love-me-render', class extends XtalMethod{});
+```
+
+But because this isn't using ES6 Modules (yet), and I didn't want to pollute the global namespace with the name of this class, you can add the attribute data-as to the script reference:
+
+```JavaScript
+<script>
+    <script src="path/to/xtal-method.js" data-as="love-me-render"></script>
+</script>
 ```
 
 Even if you give it a new name, the "canonical" name, xtal-method, will still work.  If you are building a reusable component, and that component leverages this one in its template markup, you should stick with the canonical name.  
 
-
-=====================
+## Inline Markup
 
 Keeping the markup simple, as shown above, where the renderer function is passed in as a property, will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the renderer was set.  The option to define the formatter inline, as shown below, is meant to eliminate that nuisance.
 
-## Inline Markup
+
 
 This package also contains a second custom element, xtal-import-export, which allows us to define the renderer (and even the input) inline.
 
