@@ -1,6 +1,7 @@
 (function () {
     const t = document.currentScript.dataset.as;
-    const tagName = t ? t : 'xtal-method';
+    const canonicalTagName = 'xtal-method';
+    const tagName = t ? t : canonicalTagName;
     if (customElements.get(tagName))
         return;
     /**
@@ -99,6 +100,11 @@
             }));
         }
     }
-    customElements.define(tagName, XtalMethod);
+    customElements.define(canonicalTagName, XtalMethod);
+    if (canonicalTagName !== tagName) {
+        class XtalCustom extends XtalMethod {
+        }
+        customElements.define(tagName, XtalCustom);
+    }
 })();
 //# sourceMappingURL=xtal-method.js.map

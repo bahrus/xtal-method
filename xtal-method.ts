@@ -1,7 +1,8 @@
 (function () {
     
     const t = (document.currentScript as HTMLScriptElement).dataset.as;
-    const tagName = t ? t : 'xtal-method'; 
+    const canonicalTagName = 'xtal-method';
+    const tagName = t ? t : canonicalTagName; 
     if(customElements.get(tagName)) return;
     /**
     * `xtal-method`
@@ -111,5 +112,10 @@
 
 
     }
-    customElements.define(tagName, XtalMethod);
+    customElements.define(canonicalTagName, XtalMethod);
+    if(canonicalTagName !== tagName){
+        class XtalCustom extends XtalMethod{}
+        customElements.define(tagName, XtalCustom);
+    }
+    
 })();

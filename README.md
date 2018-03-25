@@ -6,7 +6,7 @@ A significant subset of the web development community is enamored with the conce
 
 \<xtal-method\> adopts the same philosophy, but sets its aim much lower (and is ultimately helping with a different problem).  It views itself as a helper element web component, similar in concept to \<dom-if\> or \<dom-repeat\> or \<iron-list\>, but where the expression syntax has the full breadth of ES6+ JavaScript (which doesn't currently include JSX, but does include the letter h). For example, it allows you to define the markup based on (tagged) literal templates. 
 
-xtal-method is a ~670B gzipped and minified, dependency free web component.  
+xtal-method is a ~690B gzipped and minified, dependency free web component.  
 
 With \<xtal-method\>, one pairs up  an input JavaScript object with a functional renderer, and their offspring is HTML (or SVG).  The output of the transformation becomes a child of the element.
 
@@ -20,7 +20,7 @@ The renderer property of \<xtal-method\> is of type function, a function that ta
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
 ``` 
 
-## Just don't call me late to dinner
+## Just don't call me late-to-supper
 
 Usually, giving a semantic name to a custom element is fairly straightforward. Especially if they are visual -- elliptical-chart, mobius-grid, pissed-off-cat -- those are easy to read and comprehend.  But what do you call something that takes an input, a function, and generates an output?
 
@@ -47,6 +47,11 @@ To define your alternative name (globally), add the attribute data-as to the scr
     <script src="path/to/xtal-method" data-as="love-me-render"></script>
 </head>
 ```
+
+Even if you give it a new name, the "canonical" name, xtal-method, will still work.  If you are building a reusable component, and that component leverages this one in its template markup, you should stick with the canonical name.  
+
+
+=====================
 
 Keeping the markup simple, as shown above, where the renderer function is passed in as a property, will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the renderer was set.  The option to define the formatter inline, as shown below, is meant to eliminate that nuisance.
 

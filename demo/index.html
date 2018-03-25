@@ -9,7 +9,7 @@
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script async src="https://cdn.jsdelivr.net/npm/xtal-json-merge@0.1.1/build/ES6/json-merge.js"></script>
-  <script src="../xtal-method.js"></script>
+  <script src="../xtal-method.js" data-as="xtal-methodx"></script>
   <script src="../xtal-import-export.js"></script>
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
@@ -83,7 +83,7 @@ ${items.map(item => `
               </script>
               </xtal-import-export>
             </xtal-method>
-            <xtal-method input="[[todos]]">
+            <xtal-methodx input="[[todos]]">
               <xtal-import-export>
               <!-- "ish" is added in type attribute below to make the script inactive, but preserve
               syntax highlighting in VS Code (at least)-->
@@ -116,7 +116,7 @@ ${repeat(items, item => item.id,  item => html`
                   <li id="1">Get the broom</li>
                 </ul>
               </div>
-            </xtal-method>
+            </xtal-methodx>
           </template>
         </dom-bind>
       </template>
