@@ -12,13 +12,16 @@ With \<xtal-method\>, one pairs up  an input JavaScript object with a functional
 
 \<xtal-method\> only has two key, required properties for anything to happen:  input and renderer.
 
-As the input property of \<xtal-method\> is established and then changes, the renderer generates the html output, and inserts it inside the \<xtal-method\> element instance, or updates the same target element as the input property changes.  A "dom-change" event fires after each DOM update.
+As the input property of \<xtal-method\> is established and then changes, the renderer generates the html output, and inserts it inside the \<xtal-method\> element instance, or updates the same target element as the input property changes. 
 
 The renderer property of \<xtal-method\> is of type function, a function that takes two arguments -- an object or array which needs to be presented, and a formatter function that generates a DOM (or SVG) node tree.  The renderer property can be passed to the element instance via traditional binding:
 
 ```html
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
 ``` 
+
+[TODO]  xtal-method has another property/attribute, "disabled" that allows the rendering to be delayed.  The most obvious reason for supporting this is to prevent rendering when it isn't needed -- for example, if the element is currently hidden.  Later I will discuss another potentially important reason why I think this could be useful.
+
 
 ## Just don't call me late-to-supper
 
@@ -206,6 +209,42 @@ And then reference it as follows:
 
 Note the static method call:  Xtal.insert.  This inserts the inner text of the script tags with the id's _root_lit_html, _lit_html, _lit_repeat defined in the header above.
 
+## Adoption Services [TODO]
+
+I think there's another significant reason this kind of inline "markup" could be of use, when combined with the disabled property mentioned earlier. And that has to do with how light children behave when they get slotted into shadow DOM.  Normally, these children are treated quite differently compared to the Shadow DOM defined within the component.  Sort of like being a son-in-law or daughter-in-law, where you still act polite in front of each other (usually).  And that difference has [many benefits](https://medium.com/@RubenOostinga/avoiding-deeply-nested-component-trees-973edb632991).  But there are some scenarios, I believe, where one really wants the children to be treated exactly as if they were part of the component itself -- i.e. getting fully adopted.  Examples are wanting the children to be styled like the rest of the children inside the Shadow DOM, emittting events the Shadow DOM children can hear, etc.
+
+If we place the inline code inside a light child, like this:
+
+```html
+<my-component>
+    <xtal-method input="[[todos]]" disabled >
+        <xtal-import-export>
+            <script type="module ish">
+            ...
+            </script>
+        </xtal-import-export>
+    </xtal-method>
+</my-component>
+```
+
+Then my-component can be coded in such a way that it will "enable" it's light children after being slotted, and "poof", the children are now directly added to the shadow DOM, if we allow xtal-method to be passed the target (the Shadow DOM). [TODO]
+
+I've tried doing the same trick with a template light child, and ran into a wall (maybe I'm missing something).  But anyway, this approach would still allow the children to be dynamically generated.
+
+This starts to look a little complicated -- too many tags.
+
+So a third tag, xtal-import-dom adds the target property and combines the two tags together:
+
+```html
+<my-component>
+    <xtal-import-dom input="[[todos]]" disabled >
+        <script type="module ish">
+            ...
+        </script>
+    </xtal-import-dom>
+</my-component>
+``` 
+
 ## Server-side rendering of initial paint
 
 By default, \<xtal-method\> dynamically creates a div element with attribute role="target" as the rendering target, and appends it inside the \<xtal-method\> tag.  This serves as the target element for where to dump the html (or svg) each time the input changes.
@@ -361,7 +400,7 @@ ${repeat(items, item => item.id,  item => html`
 </xtal-method>
 ```  
 
-What this example illustrates, though, is that we need to know *when* to do the derender.  One could use a mutation observer, but I think it is better to rely on a specific event from the custom element that retrieves the html.  It seems that Polymer has standardized on ["dom-change"](https://github.com/Polymer/polymer/blob/master/lib/elements/dom-repeat.html#L522) as the name for this event.  So the derenderer function will apply whenever it encounters the dom change event.
+What this example illustrates, though, is that we need to know *when* to do the derender.  One could use a mutation observer for that.
  
 
 

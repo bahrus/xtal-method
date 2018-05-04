@@ -103,10 +103,10 @@
  
             }
             this._renderer(this._input, this._target);
-            this.dispatchEvent(new CustomEvent('dom-change', {
-                bubbles: true,
-                composed: true
-              } as CustomEventInit));
+            // this.dispatchEvent(new CustomEvent('dom-change', {
+            //     bubbles: true,
+            //     composed: true
+            //   } as CustomEventInit));
         }
 
 
