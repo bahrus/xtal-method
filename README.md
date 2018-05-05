@@ -43,21 +43,21 @@ This package also contains a second custom element, xtal-inline-method, which al
 For example, here we see an untagged literal template, with no helper library, being used to set the innerHTML of the element:
 
 ```html
-            <xtal-method-inline input="[[todos]]">
-                <script type="module ish">
-                    const todoFormatterVulnerableToSecurityHacks = items => `
-                    Generated with no helper library:<br>
-                    <ul>
-    ${items.map(item => `
-                        <li>${item.value}</li>
-    `).join('')}
-                    </ul>
-                    `
-                    export const renderer = (list, target) => {
-                    target.innerHTML = todoFormatterVulnernableToSecurityHacks(list);
-                    }
-                </script>
-            </xtal-method-inline>
+        <xtal-im-ex input="[[todos]]">
+            <script type="module ish">
+                const todoFormatterVulnerableToSecurityHacks = items => `
+                Generated with no helper library:<br>
+                <ul>
+${items.map(item => `
+                    <li>${item.value}</li>
+`).join('')}
+                </ul>
+                `
+                export const renderer = (list, target) => {
+                target.innerHTML = todoFormatterVulnernableToSecurityHacks(list);
+                }
+            </script>
+        </xtal-im-ex>
             
 ```
 
@@ -70,7 +70,7 @@ Almost certainly you will want to use a library where such issues are thought th
 For example let's see how we can use lit-html to render the to-do list example from the lit-html link above.
 
 ```html
-<xtal-inline-method input="[[todos]]">
+<xtal-im-ex input="[[todos]]">
     <script type="module ish">
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
@@ -86,7 +86,7 @@ ${repeat(items, item => item.id,  item => html`
         export const renderer = (list, target) => render(todoFormatter(list), target);
 
     </script>
-</xtal-inline-method>
+</xtal-im-ex>
                 
 ```
 
@@ -95,8 +95,7 @@ ${repeat(items, item => item.id,  item => html`
 The script tag inside the \<xtal-inline-method\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the parent element instance,  \<xtal-inline-method\>  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
 ```html
-<xtal-method>
-    <xtal-inline-method>
+<xtal-im-ex>
     <script type="module ish">
         const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
@@ -118,8 +117,7 @@ ${repeat(items, item => item.id,  item => html`
             { "id": 3, "value": "Get a funky haircut", "done": false }
         ]
     </script>
-    </xtal-inline-method>
-</xtal-method>
+</xtal-im-ex>
 ```
 
 Another approach to server-side generated content is discussed farther down.
@@ -157,8 +155,7 @@ Placing these in one central location, perhaps in the header of index.html (if a
 And then reference it as follows:
 
 ```html
-<xtal-method input="[[todos]]">
-    <xtal-import-export>
+<xtal-im-ex input="[[todos]]">
     <script type="module ish">
         XtalIMEX.insert(_root_lit_html, _lit_html, _lit_repeat);
         const todoFormatter = items => html`
@@ -173,13 +170,12 @@ And then reference it as follows:
         `;
         export const renderer = (list, target) => render(todoFormatter(list), target);
     </script>
-    </xtal-import-export>
-</xtal-method>
+</xtal-im-ex>
 ```
 
 Note the static method call:  Xtal.insert.  This inserts the inner text of the script tags with the id's _root_lit_html, _lit_html, _lit_repeat defined in the header above.
 
-## Adoption Services [TODO]
+## Adoption Services
 
 I think there's another significant reason this kind of inline "markup" could be of use, when combined with the disabled property mentioned earlier. And that has to do with how light children behave when they get slotted into shadow DOM.  Normally, these children are treated quite differently compared to the Shadow DOM defined within the component.  Sort of like being a son-in-law or daughter-in-law, where you still act polite in front of each other (usually).  And that difference has [many benefits](https://medium.com/@RubenOostinga/avoiding-deeply-nested-component-trees-973edb632991).  But there are some scenarios, I believe, where one really wants the children to be treated exactly as if they were part of the component itself -- i.e. getting fully adopted.  Examples are wanting the children to be styled like the rest of the children inside the Shadow DOM, emittting events the Shadow DOM children can hear, etc.
 
@@ -187,33 +183,17 @@ If we place the inline code inside a light child, like this:
 
 ```html
 <my-component>
-    <xtal-method input="[[todos]]" disabled >
-        <xtal-import-export>
-            <script type="module ish">
-            ...
-            </script>
-        </xtal-import-export>
-    </xtal-method>
+    <xtal-im-ex input="[[todos]]" disabled >
+        <script type="module ish">
+        ...
+        </script>
+    </xtal-im-ex>
 </my-component>
 ```
 
-Then my-component can be coded in such a way that it will "enable" its light children after being slotted, and "poof", the children are now directly added to the shadow DOM, if we allow xtal-method to be passed the target (the Shadow DOM). [TODO]
+Then my-component can be coded in such a way that it will "enable" its light children after being slotted, and "poof", the children are now directly added to the shadow DOM, if we allow xtal-im-ex to be passed the target (the Shadow DOM).
 
 I've tried doing the same trick with a template light child, and ran into a wall (maybe I'm missing something).  But anyway, this approach would still allow the children to be dynamically generated.
-
-This starts to look a little complicated -- too many tags.
-
-So a third tag, xtal-import-dom adds the target property and combines the two tags together:
-
-```html
-<my-component>
-    <xtal-import-dom input="[[todos]]" disabled >
-        <script type="module ish">
-            ...
-        </script>
-    </xtal-import-dom>
-</my-component>
-``` 
 
 ## Server-side rendering of initial paint
 
