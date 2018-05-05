@@ -89,16 +89,16 @@ export class XtalMethod extends HTMLElement {
     }
 
     connectedCallback() {
-        this._upgradeProperties(['input', 'renderer', 'derenderer', 'target', disabled])
+        this._upgradeProperties([input, 'renderer', 'derenderer', 'target', disabled])
 
     }
-    changedAttributeCallback(name: string, oldVal: string, newVal: string){
+    attributeChangedCallback(name: string, oldVal: string, newVal: string){
         switch(name){
-            case 'disabled':
+            case disabled:
                 this.derender();
                 this.render();
                 break;
-            case 'input':
+            case input:
                 this.input =  JSON.parse(newVal);
                 break;
         }
