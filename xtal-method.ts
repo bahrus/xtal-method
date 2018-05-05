@@ -1,5 +1,6 @@
 
 const disabled = 'disabled';
+const input = 'input';
 /**
 * `xtal-method`
 * Create a localized link between an input object and a functional renderer
@@ -37,7 +38,7 @@ export class XtalMethod extends HTMLElement {
     }
     static get is() { return 'xtal-method'; }
     static get observedAttributes(){
-        return [disabled];
+        return [disabled, input];
     }
 
     _upgradeProperties(props: string[]) {
@@ -96,6 +97,9 @@ export class XtalMethod extends HTMLElement {
             case 'disabled':
                 this.derender();
                 this.render();
+                break;
+            case 'input':
+                this.input =  JSON.parse(newVal);
                 break;
         }
     }
