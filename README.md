@@ -90,8 +90,6 @@ ${repeat(items, item => item.id,  item => html`
                 
 ```
 
-
-
 The script tag inside the \<xtal-inline-method\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the parent element instance,  \<xtal-inline-method\>  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
 ```html
