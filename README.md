@@ -6,7 +6,7 @@ A significant subset of the web development community is enamored with the conce
 
 \<xtal-method\> adopts the same philosophy, but sets its aim much lower (and is ultimately helping with a different problem).  It views itself as a helper element web component, similar in concept to \<dom-if\> or \<dom-repeat\> or \<iron-list\>, but where the expression syntax has the full breadth of ES6+ JavaScript (which doesn't currently include JSX, but does include the letter h). For example, it allows you to define the markup based on (tagged) literal templates. 
 
-xtal-method is a ~720B gzipped and minified, dependency free web component.  
+xtal-method is a ~777B gzipped and minified, dependency free web component.  
 
 With \<xtal-method\>, one pairs up an input JavaScript object with a functional renderer, and their offspring is HTML (or SVG).  The output of the transformation becomes a child of the element.
 
@@ -38,7 +38,7 @@ Keeping the markup simple, as shown above, where the renderer function is passed
 
 
 
-This package also contains a second custom element, xtal-inline-method, which allows us to define the renderer (and even the input) inline.
+This package also contains a second custom element, xtal-im-ex, which allows us to define the renderer (and even the input) inline.
 
 For example, here we see an untagged literal template, with no helper library, being used to set the innerHTML of the element:
 
@@ -61,7 +61,7 @@ ${items.map(item => `
             
 ```
 
- It is an 840B (gzipped and minified) dependency free web component.
+ It is an 800B (gzipped and minified) dependency free web component.
 
 **NB**:  Code like what is shown above is quite vulnerable to hacking, especially if you can't trust the source of the data in your todo list.  If the todo list changes frequently, performance will be sub optimal, at least with current browsers, and it wouldn't integrate nicely with modern binding frameworks.  If these features aren't critical at first (e.g. during the initial prototyping), then it should be possible to switch to one of the more robust solutions mentioned below when the time is right (ideally before it goes to production) witout many changes.
 
