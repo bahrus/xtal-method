@@ -9,8 +9,7 @@
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script async src="https://cdn.jsdelivr.net/npm/xtal-json-merge@0.1.1/build/ES6/json-merge.js"></script>
-  <script src="../xtal-method.js" data-as="xtal-methodx"></script>
-  <script src="../xtal-import-export.js"></script>
+  <script type="module" src="../xtal-im-ex.js"></script>
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <!-- <link rel="import" href="../../polymer/lib/elements/dom-bind.html"> -->
@@ -66,8 +65,7 @@
                   ]
                 </script>
             </json-merge>
-            <xtal-method input="[[todos]]">
-              <xtal-import-export>
+            <xtal-im-ex input="[[todos]]">
                 <script type="module ish">
                 const todoFormatter = items => `
                 Generated with no helper library (but this is a security risk):<br>
@@ -81,10 +79,8 @@ ${items.map(item => `
                   target.innerHTML = todoFormatter(list);
                 }
               </script>
-              </xtal-import-export>
-            </xtal-method>
-            <xtal-methodx input="[[todos]]">
-              <xtal-import-export>
+            </xtal-im-ex>
+            <xtal-im-ex input="[[todos]]">
               <!-- "ish" is added in type attribute below to make the script inactive, but preserve
               syntax highlighting in VS Code (at least)-->
               <script type="module ish">
@@ -109,14 +105,13 @@ ${repeat(items, item => item.id,  item => html`
                       return todos;
                     }
                 </script>
-                </xtal-import-export>
               <div role="target">
                 <h1>My Todos</h1>
                 <ul>
                   <li id="1">Get the broom</li>
                 </ul>
               </div>
-            </xtal-methodx>
+            </xtal-im-ex>
           </template>
         </dom-bind>
       </template>

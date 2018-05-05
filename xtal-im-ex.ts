@@ -1,51 +1,33 @@
 
-(function () {
-    const t = (document.currentScript as HTMLScriptElement).dataset.as;
-    const tagName = t ? t : 'xtal-import-export';
-    if(customElements.get(tagName)) return;
+    import {XtalMethod} from './xtal-method.js';
     /**
-    * `xtal-import-export`
+    * `xtal-im-ex`
     * Set properties of a parent custom element using ES6 module notation
     *
     * @customElement
     * @polymer
     * @demo demo/index.html
     */
-    class XtalImportExport extends HTMLElement {
+    class XtalIMEX extends XtalMethod {
         _previousEvaluatedText: string;
+        static get is(){
+            return 'xtal-im-ex';
+        }
         evaluateScriptText() {
-            const templateTag = this.querySelector('template') as HTMLTemplateElement;
-            let clone: DocumentFragment;
-            if (templateTag) {
-                clone = document.importNode(templateTag.content, true) as HTMLDocument;
-            } 
             let scriptTag = this.querySelector('script');
-            if (!scriptTag && clone) {
-                scriptTag = clone.querySelector('script');
-            }
             if (!scriptTag) {
-                console.error('No script tag  found to apply.');
+                setTimeout(() =>{
+                    this.evaluateScriptText();
+                }, 100);
                 return;
             }
             this.applyScript(scriptTag);
         }
-                // replaceAll(target: string, search: string, replacement: string) {
-        //     //https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
-        //     return target.split(search).join(replacement);
-        // }
-        //regExp = /(.*)export(\s+)const(\s+)[a-zA-Z]+(\s*)=/g;
         insertFragmentRegExp = /XtalIMEX.insert\((.*)\);/g;
         applyScript(scriptTag: HTMLScriptElement){
             const innerText = scriptTag.innerText;
             if (innerText === this._previousEvaluatedText) return;
             this._previousEvaluatedText = innerText;
-            
-            // let matches;
-            // while (matches = this.insertFragmentRegExp.exec(innerText)) {
-            //   insertsEliminatedText = insertsEliminatedText.replace('scriptTag=>XtalMethod.insert(scriptTag,' + matches[1] + ');', '');
-            //   console.log(matches);
-            //   console.log('Middle text is: ' + matches[1]);
-            // }
             const splitInsertText = innerText.split(this.insertFragmentRegExp);
             const insertedText = splitInsertText.map((val, idx) =>{
                 if(idx % 2 === 0) return val;
@@ -73,20 +55,26 @@
                 splitText[i] = 'const ' + lhs + ' = exportconst.' + lhs + ' = ' + token.substr(iPosOfEq + 1);
             }
             const modifiedText = splitText.join('');
+            const async = modifiedText.indexOf('await ') > -1 ? 'async' : '';
             const protectedScript = `[
-            async function () {
+            ${async} function () {
                 const exportconst = {};
                 ${modifiedText}
                 return exportconst;
             }
             ]`;
             const fnArr =  eval(protectedScript);
-            const target = this.parentElement;;
-            const exportedSymbols = fnArr[0]().then(exportedSymbols =>{
-                Object.assign(target, exportedSymbols);
-            }).catch(e =>{
-                throw e;
-            })
+            const target = this;
+            if(async){
+                const exportedSymbols = fnArr[0]().then(exportedSymbols =>{
+                    Object.assign(target, exportedSymbols);
+                }).catch(e =>{
+                    throw e;
+                })
+            }else{
+                Object.assign(target, fnArr[0]());
+            }
+
             //Object.assign(this, srcObj);
         }
 
@@ -94,5 +82,4 @@
             this.evaluateScriptText();
         }
     }
-    customElements.define(tagName, XtalImportExport);
-})();
+    customElements.define(XtalIMEX.is, XtalIMEX);

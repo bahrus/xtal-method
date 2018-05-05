@@ -6,9 +6,9 @@ A significant subset of the web development community is enamored with the conce
 
 \<xtal-method\> adopts the same philosophy, but sets its aim much lower (and is ultimately helping with a different problem).  It views itself as a helper element web component, similar in concept to \<dom-if\> or \<dom-repeat\> or \<iron-list\>, but where the expression syntax has the full breadth of ES6+ JavaScript (which doesn't currently include JSX, but does include the letter h). For example, it allows you to define the markup based on (tagged) literal templates. 
 
-xtal-method is a ~690B gzipped and minified, dependency free web component.  
+xtal-method is a ~720B gzipped and minified, dependency free web component.  
 
-With \<xtal-method\>, one pairs up  an input JavaScript object with a functional renderer, and their offspring is HTML (or SVG).  The output of the transformation becomes a child of the element.
+With \<xtal-method\>, one pairs up an input JavaScript object with a functional renderer, and their offspring is HTML (or SVG).  The output of the transformation becomes a child of the element.
 
 \<xtal-method\> only has two key, required properties for anything to happen:  input and renderer.
 
@@ -16,48 +16,21 @@ As the input property of \<xtal-method\> is established and then changes, the re
 
 The renderer property of \<xtal-method\> is of type function, a function that takes two arguments -- an object or array which needs to be presented, and a formatter function that generates a DOM (or SVG) node tree.  The renderer property can be passed to the element instance via traditional binding:
 
+Polymer notation:
+
 ```html
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
 ``` 
 
-[TODO]  xtal-method has another property/attribute, "disabled" that allows the rendering to be delayed.  The most obvious reason for supporting this is to prevent rendering when it isn't needed -- for example, if the element is currently hidden.  Later I will discuss another potentially important reason why I think this could be useful.
-
-
-## Just don't call me late-to-supper
-
-Usually, giving a semantic name to a custom element is fairly straightforward. Especially if they are visual -- elliptical-chart, mobius-grid, pissed-off-cat -- those are easy to read and comprehend.  But what do you call something that takes an input, a function, and generates an output?
-
-If you don't care for the chemical metaphor used here, you can call it whatever you want.
-
-If you are an Elvis fan, you can use:
+JSX:notation:
 
 ```html
-<love-me-render input="[[todos]]" renderer="[[todoFormatter]]"></love-me-render>
-```
+    <xtal-method input={{his.todos} renderer={this.todoFormatter}></xtal-method>
+``` 
 
-Or maybe you want to code with attitude:
+It would be very wrong to ask why JSX would use a custom element to render a property.  Very wrong indeed.
 
-```html
-<garbage-in-garbage-out input="[[todos]]" renderer="[[todoFormatter]]"></garbage-in-garbage-out>
-```
-
-As long as you stick to lisp-case, you are good!
-
-Ideally, with ES6 Imports, you could just import this js, and extend it:
-
-```JavaScript
-customElements.define('love-me-render', class extends XtalMethod{});
-```
-
-But because this isn't using ES6 Modules (yet), and I didn't want to pollute the global namespace with the name of this class, you can add the attribute data-as to the script reference:
-
-```JavaScript
-<script>
-    <script src="path/to/xtal-method.js" data-as="love-me-render"></script>
-</script>
-```
-
-Even if you give it a new name, the "canonical" name, xtal-method, will still work.  If you are building a reusable component, and that component leverages this one in its template markup, you should stick with the canonical name.  
+xtal-method has another property/attribute, "disabled" that allows the rendering to be delayed.  The most obvious reason for supporting this is to prevent rendering when it isn't needed -- for example, if the element is currently hidden.  Later I will discuss another potentially important reason why I think this could be useful.
 
 ## Inline Markup
 
@@ -65,13 +38,12 @@ Keeping the markup simple, as shown above, where the renderer function is passed
 
 
 
-This package also contains a second custom element, xtal-import-export, which allows us to define the renderer (and even the input) inline.
+This package also contains a second custom element, xtal-inline-method, which allows us to define the renderer (and even the input) inline.
 
 For example, here we see an untagged literal template, with no helper library, being used to set the innerHTML of the element:
 
 ```html
-            <xtal-method input="[[todos]]">
-              <xtal-import-export>
+            <xtal-method-inline input="[[todos]]">
                 <script type="module ish">
                     const todoFormatterVulnerableToSecurityHacks = items => `
                     Generated with no helper library:<br>
@@ -82,14 +54,14 @@ For example, here we see an untagged literal template, with no helper library, b
                     </ul>
                     `
                     export const renderer = (list, target) => {
-                    target.innerHTML = todoFormatterVulernableToSecurityHacks(list);
+                    target.innerHTML = todoFormatterVulnernableToSecurityHacks(list);
                     }
                 </script>
-              </xtal-import-export>
-            </xtal-method>
+            </xtal-method-inline>
+            
 ```
 
-xtal-import-export is also similarly renamable.  It is an 840B (gzipped and minified) dependency free web component.
+ It is an 840B (gzipped and minified) dependency free web component.
 
 **NB**:  Code like what is shown above is quite vulnerable to hacking, especially if you can't trust the source of the data in your todo list.  If the todo list changes frequently, performance will be sub optimal, at least with current browsers, and it wouldn't integrate nicely with modern binding frameworks.  If these features aren't critical at first (e.g. during the initial prototyping), then it should be possible to switch to one of the more robust solutions mentioned below when the time is right (ideally before it goes to production) witout many changes.
 
@@ -98,8 +70,7 @@ Almost certainly you will want to use a library where such issues are thought th
 For example let's see how we can use lit-html to render the to-do list example from the lit-html link above.
 
 ```html
-<xtal-method input="[[todos]]">
-    <xtal-import-export>
+<xtal-inline-method input="[[todos]]">
     <script type="module ish">
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
@@ -115,18 +86,17 @@ ${repeat(items, item => item.id,  item => html`
         export const renderer = (list, target) => render(todoFormatter(list), target);
 
     </script>
-    </xtal-import-export>
-</xtal-method>
+</xtal-inline-method>
                 
 ```
 
 
 
-The script tag inside the \<xtal-import-export\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the parent elment instance,  \<xtal-method\> in this case.  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
+The script tag inside the \<xtal-inline-method\> allows us to specify these two properties (and more discussed below) via the **export const =**  syntax.  I.e. all the export const's inside the script tag are used to set properties of the parent element instance,  \<xtal-inline-method\>  So you could, if you want, not *just* specify the renderer property, but you could *also* set the initial input property in the same way.  This allows the server to pass the original state as part of the document.  This might be useful for the first paint display, and then the input property of the custom element can change based on ajax calls prompted by user actions for subsequent renders:
 
 ```html
 <xtal-method>
-    <xtal-import-export>
+    <xtal-inline-method>
     <script type="module ish">
         const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
@@ -148,7 +118,7 @@ ${repeat(items, item => item.id,  item => html`
             { "id": 3, "value": "Get a funky haircut", "done": false }
         ]
     </script>
-    </xtal-import-export>
+    </xtal-inline-method>
 </xtal-method>
 ```
 
@@ -156,7 +126,7 @@ Another approach to server-side generated content is discussed farther down.
 
 ## Syntax Shenanigans
 
-It is highly desirable that the contents of the script tag **not** be processed by the browser before being manipulated by \<xtal-method\>, as it is a waste of processing and a potential source of unintended side effects (like generating an error in the console when unexpected syntax is encountered).  There are a number of ways this can be done, with the pro's and con's listed below:
+It is highly desirable that the contents of the script tag **not** be processed by the browser before being manipulated by \<xtal-inline-method\>, as it is a waste of processing and a potential source of unintended side effects (like generating an error in the console when unexpected syntax is encountered).  There are a number of ways this can be done, with the pro's and con's listed below:
 
 1. Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative-ish), and I use this tag repeatedly, this immediately poses a problem in my mind, which is why the following alternatives are listed (and used in the demo).
 2. Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code / GitHub / WebComponents site stops providing syntax highlighting / basic linting when doing this.  More sophisticated editors, like WebStorm, can be trained to recognize custom attributes via a feature called language injection.  Of course a VS code extension could also be built, but that seems like overkill.  Anyway, despite all these negatives, this solution should work, at least, with a high degree of confidence.
@@ -227,7 +197,7 @@ If we place the inline code inside a light child, like this:
 </my-component>
 ```
 
-Then my-component can be coded in such a way that it will "enable" it's light children after being slotted, and "poof", the children are now directly added to the shadow DOM, if we allow xtal-method to be passed the target (the Shadow DOM). [TODO]
+Then my-component can be coded in such a way that it will "enable" its light children after being slotted, and "poof", the children are now directly added to the shadow DOM, if we allow xtal-method to be passed the target (the Shadow DOM). [TODO]
 
 I've tried doing the same trick with a template light child, and ran into a wall (maybe I'm missing something).  But anyway, this approach would still allow the children to be dynamically generated.
 
@@ -364,7 +334,7 @@ But what if we want to get a whole new batch of data from the server?  Does it i
 
 Typically, if we are talking about a list, the data won't change that much.  The whole point of fancy renderers is they outperform setting innerHTML directly, as they can efficiently update only those parts that change.  So here I suspect one would want to switch to the more traditional approach, and retrieve JSON.
 
-To help manage this complex song and dance, xtal-method will expose to its peers whether the content displayed is the original content or not.  This will allow other elemnts to know whether to retrieve HTML vs JSON should they agree that this analysis makes sense.
+To help manage this complex song and dance, xtal-method will expose to its peers whether the content displayed is the original content or not.  This will allow other elements to know whether to retrieve HTML vs JSON should they agree that this analysis makes sense.
 
 That markup could look as follows:
 

@@ -1,7 +1,7 @@
 {
   "sources":[
     "xtal-method.js",
-    "xtal-import-export.js"
+    "xtal-im-ex.js"
   ],
   "lint": {
     "rules": [
