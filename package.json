@@ -1,5 +1,6 @@
 {
   "name": "xtal-method",
+  "flat": true,
   "version": "0.0.13",
   "description": "Custom Element that can apply functional renderers like lit-html to the vicinity of the markup.",
   "main": "xtal-method.js",
