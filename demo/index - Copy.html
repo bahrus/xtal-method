@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+  <title>xtal-method demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script async src="https://cdn.jsdelivr.net/npm/xtal-json-merge@0.1.1/build/ES6/json-merge.js"></script>
+  <script type="module" src="../xtal-im-ex.js"></script>
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <!-- <link rel="import" href="../../polymer/lib/elements/dom-bind.html"> -->
+
+
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </custom-style>
+  <script type="module ish" id="_root_lit_html">
+    const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
+  </script>
+  <script type="module ish" id="_lit_html">
+      const { html, render } = await import(root + 'lit-html.js');
+  </script>
+  <script type="module ish" id="_lit_repeat">
+    const { repeat } = await import(root + 'lib/repeat.js');
+  </script>
+</head>
+
+<body>
+  <div class="vertical-section-container centered">
+    <h3>Basic xtal-method demo</h3>
+    <p>NB: Demo only works in browsers that support
+      <a href="https://developers.google.com/web/updates/2017/11/dynamic-import">dynamic imports</a>
+    </p>
+    <demo-snippet>
+
+      <template>
+        <dom-bind>
+          <template>
+
+            <json-merge watch="[]" result="{{todos}}" delay="1000">
+              <script type="application/json">
+                      [
+                        [
+                          { "id": 1, "value": "Sweep the floor", "done": false },
+                          { "id": 2, "value": "Prepare fancy salad", "done": true },
+                          { "id": 3, "value": "Get a funky haircut", "done": false }
+                        ]
+                      ]
+              </script>
+            </json-merge>
+            <json-merge watch="[]" result="{{todos}}" delay="4000">
+              <script type="application/json">
+                  [
+                    [
+                      { "id": 1, "value": "Mop the floor", "done": false },
+                      { "id": 2, "value": "Eat fancy salad", "done": true },
+                      { "id": 3, "value": "Cry about the haircut", "done": false },
+                      { "id": 4, "value": "Watch another celebrity flush their career down the toilet", "done": false }
+                    ]
+                  ]
+                </script>
+            </json-merge>
+            <xtal-im-ex input="[[todos]]">
+                <script type="module ish">
+                const todoFormatter = items => `
+                Generated with no helper library (but this is a security risk):<br>
+                <ul>
+${items.map(item => `
+                      <li>${item.value}</li>
+`).join('')}
+                </ul>
+                `
+                export const renderer = (list, target) => {
+                  target.innerHTML = todoFormatter(list);
+                }
+              </script>
+            </xtal-im-ex>
+            <xtal-im-ex input="[[todos]]">
+              <!-- "ish" is added in type attribute below to make the script inactive, but preserve
+              syntax highlighting in VS Code (at least)-->
+              <script type="module ish">
+                    XtalIMEX.insert(_root_lit_html, _lit_html, _lit_repeat);
+                    const todoFormatter = items => html`
+                      <h1>My Todos</h1>
+                        <ul>
+${repeat(items, item => item.id,  item => html`
+                          <li class="${item.done ? 'done' : ''}">${item.value}</li>
+`)}
+                        </ul>
+                    `;
+                    export const renderer = (list, target) => render(todoFormatter(list), target);
+                    export const derenderer = el =>{
+                      const todos = [];
+                      el.querySelectorAll('li').forEach(element => {
+                        todos.push({
+                          id: element.id,
+                          value: element.innerText
+                        });
+                      });
+                      return todos;
+                    }
+                </script>
+              <div role="target">
+                <h1>My Todos</h1>
+                <ul>
+                  <li id="1">Get the broom</li>
+                </ul>
+              </div>
+            </xtal-im-ex>
+          </template>
+        </dom-bind>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+
+</html>
