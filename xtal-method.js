@@ -1,3 +1,4 @@
+import { XtallatX } from 'xtal-latx/xtal-latx.js';
 const disabled = 'disabled';
 const input = 'input';
 /**
@@ -8,23 +9,12 @@ const input = 'input';
 * @polymer
 * @demo demo/index.html
 */
-export class XtalMethod extends HTMLElement {
+export class XtalMethod extends XtallatX(HTMLElement) {
     get target() {
         return this._target;
     }
     set target(val) {
         this._target = val;
-    }
-    get disabled() {
-        return this.hasAttribute(disabled);
-    }
-    set disabled(val) {
-        if (val) {
-            this.setAttribute(disabled, '');
-        }
-        else {
-            this.removeAttribute(disabled);
-        }
     }
     set renderer(val) {
         this._renderer = val;
@@ -37,31 +27,17 @@ export class XtalMethod extends HTMLElement {
     static get observedAttributes() {
         return [disabled, input];
     }
-    _upgradeProperties(props) {
-        props.forEach(prop => {
-            if (this.hasOwnProperty(prop)) {
-                let value = this[prop];
-                delete this[prop];
-                this[prop] = value;
-            }
-        });
-    }
     set derenderer(val) {
         this._derenderer = val;
-        this.derender();
     }
     get derenderer() {
         return this._derenderer;
     }
     set initState(val) {
         this._initState = val;
-        this.dispatchEvent(new CustomEvent('init-state-changed', {
-            detail: {
-                value: val
-            },
-            bubbles: true,
-            composed: true
-        }));
+        this.de('init-state', {
+            value: val,
+        });
     }
     get initState() {
         return this._initState;
@@ -72,9 +48,6 @@ export class XtalMethod extends HTMLElement {
     }
     get input() {
         return this._input;
-    }
-    disconnectedCallback() {
-        //this._domObserver.disconnect();
     }
     connectedCallback() {
         this._upgradeProperties([input, 'renderer', 'derenderer', 'target', disabled]);
@@ -91,7 +64,7 @@ export class XtalMethod extends HTMLElement {
         }
     }
     derender() {
-        if (!this._derenderer || this.disabled)
+        if (!this._derenderer)
             return;
         if (!this._target) {
             this._target = this.querySelector('[role="target"]');
@@ -101,7 +74,7 @@ export class XtalMethod extends HTMLElement {
         this.initState = this._derenderer(this._target);
     }
     render() {
-        if (!this._renderer || !this._input || this.disabled)
+        if (!this._renderer || !this._input)
             return;
         if (this._initState === this._input) {
             delete this._initState;
@@ -119,6 +92,10 @@ export class XtalMethod extends HTMLElement {
             }
         }
         this._renderer(this._input, this._target);
+    }
+    onPropsChange() {
+        if (this._disabled)
+            return;
     }
 }
 if (!customElements.get(XtalMethod.is)) {

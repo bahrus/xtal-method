@@ -55,6 +55,7 @@ export class XtalMethod extends XtallatX(HTMLElement) {
     _input;
     set input(val: object) {
         this._input = val;
+        this.render();
     }
     get input() {
         return this._input;

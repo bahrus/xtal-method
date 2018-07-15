@@ -129,13 +129,13 @@ In particular, the import statements will be the first candidate for sharing.
 To share fragments of Javascript, define each shareable fragment within a script tag with a unique id:
 
 ```html
-  <script type="module ish" id="_root_lit_html">
+  <script nomodule id="_root_lit_html">
     const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
   </script>
-  <script type="module ish" id="_lit_html">
+  <script nomodule id="_lit_html">
       const { html, render } = await import(root + 'lit-html.js');
   </script>
-  <script type="module ish" id="_lit_repeat">
+  <script nomodule id="_lit_repeat">
     const { repeat } = await import(root + 'lib/repeat.js');
   </script>
 ```

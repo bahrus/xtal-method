@@ -57,7 +57,8 @@ class XtalIMEX extends XtalMethod {
             splitText[i] = 'const ' + lhs + ' = exportconst.' + lhs + ' = ' + token.substr(iPosOfEq + 1);
         }
         const modifiedText = splitText.join('');
-        const async = modifiedText.indexOf('await ') > -1 ? 'async' : '';
+        //const async = modifiedText.indexOf('await ') > -1 ? 'async' : '';
+        const async = 'async';
         const protectedScript = `[
             ${async} function () {
                 const exportconst = {};
