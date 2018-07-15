@@ -25,7 +25,7 @@ Polymer notation:
 JSX:notation:
 
 ```html
-    <xtal-method input={{his.todos} renderer={this.todoFormatter}></xtal-method>
+    <xtal-method input={this.todos} renderer={this.todoFormatter}></xtal-method>
 ``` 
 
 It would be very wrong to ask why JSX would use a custom element to render a property.  Very wrong indeed.
@@ -37,14 +37,13 @@ xtal-method has another property/attribute, "disabled" that allows the rendering
 Keeping the markup simple, as shown above, where the renderer function is passed in as a property, will work just fine, except it will force the developer to go on a bit of a scavenger hunt to find where the renderer was set.  The option to define the formatter inline, as shown below, is meant to eliminate that nuisance.
 
 
-
 This package also contains a second custom element, xtal-im-ex, which allows us to define the renderer (and even the input) inline.
 
 For example, here we see an untagged literal template, with no helper library, being used to set the innerHTML of the element:
 
 ```html
         <xtal-im-ex input="[[todos]]">
-            <script type="module ish">
+            <script nomodule>
                 const todoFormatterVulnerableToSecurityHacks = items => `
                 Generated with no helper library:<br>
                 <ul>
@@ -61,7 +60,7 @@ ${items.map(item => `
             
 ```
 
- It is an 800B (gzipped and minified) dependency free web component.
+It is an 800B (gzipped and minified) dependency free web component.
 
 **NB**:  Code like what is shown above is quite vulnerable to hacking, especially if you can't trust the source of the data in your todo list.  If the todo list changes frequently, performance will be sub optimal, at least with current browsers, and it wouldn't integrate nicely with modern binding frameworks.  If these features aren't critical at first (e.g. during the initial prototyping), then it should be possible to switch to one of the more robust solutions mentioned below when the time is right (ideally before it goes to production) witout many changes.
 
@@ -71,7 +70,7 @@ For example let's see how we can use lit-html to render the to-do list example f
 
 ```html
 <xtal-im-ex input="[[todos]]">
-    <script type="module ish">
+    <script nomodule>
         const root = 'http://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
@@ -120,13 +119,6 @@ ${repeat(items, item => item.id,  item => html`
 
 Another approach to server-side generated content is discussed farther down.
 
-## Syntax Shenanigans
-
-It is highly desirable that the contents of the script tag **not** be processed by the browser before being manipulated by \<xtal-inline-method\>, as it is a waste of processing and a potential source of unintended side effects (like generating an error in the console when unexpected syntax is encountered).  There are a number of ways this can be done, with the pro's and con's listed below:
-
-1. Wrap the script tag inside a template tag.  \<xtal-method\> supports this.  It is probably my preferred approach, except for one major stumbling block:  It appears that my favorite Polymer component, \<dom-bind\>, purges tags it perceives to be active script tags, if they are inside a template wrapper.  Don't quote me on this, this is simply what I've observed via trial and error.  As the demo relies heavily on dom-bind (so the entire demo can be declarative-ish), and I use this tag repeatedly, this immediately poses a problem in my mind, which is why the following alternatives are listed (and used in the demo).
-2. Give the script tag attribute *type* a value no one has heard of, like type="text/lit-html".  No need for the template wrapper, then.  \<xtal-method\> also supports this. The problem is that VS Code / GitHub / WebComponents site stops providing syntax highlighting / basic linting when doing this.  More sophisticated editors, like WebStorm, can be trained to recognize custom attributes via a feature called language injection.  Of course a VS code extension could also be built, but that seems like overkill.  Anyway, despite all these negatives, this solution should work, at least, with a high degree of confidence.
-3. Give the script tag attribute *type* a value that the browser will (hopefully) **not** recognize as JavaScript, but your favorite editor / markdown viewer is fooled into thinking **is** JavaScript.  For VS Code, and markdown displays, an example of such a value is (currently) type="module ish", which is shown above. I plan to try this out for a while in different browsers (as they start to support dynamic imports).  Hopefully no one will bring this loophole to the VS Code team's attention (shh!!!).
 
 ### Boilerplate Busting with Script inserts
 
@@ -159,11 +151,11 @@ And then reference it as follows:
         const todoFormatter = items => html`
             <h1>My Todos</h1>
             <ul>
-                                                            ${repeat(items, item => item.id,  item => html`
+${repeat(items, item => item.id,  item => html`
                 <li class="${item.done ? 'done' : ''}">
                     ${item.value}
                 </li>
-                                                            `)}
+`)}
             </ul>
         `;
         export const renderer = (list, target) => render(todoFormatter(list), target);
@@ -171,7 +163,7 @@ And then reference it as follows:
 </xtal-im-ex>
 ```
 
-Note the static method call:  Xtal.insert.  This inserts the inner text of the script tags with the id's _root_lit_html, _lit_html, _lit_repeat defined in the header above.
+Note the static method call:  XtalIMEX.insert.  This inserts the inner text of the script tags with the id's _root_lit_html, _lit_html, _lit_repeat defined in the header above.
 
 ## Adoption Services
 
@@ -191,7 +183,9 @@ If we place the inline code inside a light child, like this:
 
 Then my-component can be coded in such a way that it will "enable" its light children after being slotted, and "poof", the children are now directly added to the shadow DOM, if we allow xtal-im-ex to be passed the target (the Shadow DOM).
 
-I've tried doing the same trick with a template light child, and ran into a wall (maybe I'm missing something).  But anyway, this approach would still allow the children to be dynamically generated.
+In particular xtal-im-ex has a property "target" which can be passed a DOM element inside the ShadowDOM where the output should render.
+
+Note that in this scenario, the input property can still be passed new data even after the slotting takes place.
 
 ## Server-side rendering of initial paint
 
@@ -222,7 +216,7 @@ So two additional features are defined for eliminating this performance hit:  re
 ```html
 <xtal-method input="[[todos]]" init-state="{{originalTodoList}}">
     <xtal-import-export>
-    <script type="module ish">
+    <script nomodule>
         export const derenderer = (serverSideGeneratedHtml) =>{
             const todos = [];
             serverSideGeneratedHTML.querySelectorAll('li').forEach(liEl =>{
