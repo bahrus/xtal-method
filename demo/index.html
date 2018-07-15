@@ -86,9 +86,9 @@
                       const todoFormatter = items => html`
                         <h1>My Todos</h1>
                           <ul>
-  ${repeat(items, item => item.id,  item => html`
-                            <li class="${item.done ? 'done' : ''}">${item.value}</li>
-  `)}
+                            ${repeat(items, item => item.id,  item => html`
+                                                      <li class="${item.done ? 'done' : ''}">${item.value}</li>
+                            `)}
                           </ul>
                       `;
                       export const renderer = (list, target) => render(todoFormatter(list), target);

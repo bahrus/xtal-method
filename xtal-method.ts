@@ -1,4 +1,4 @@
-
+import {XtallatX} from 'xtal-latx/xtal-latx.js'
 const disabled = 'disabled';
 const input = 'input';
 /**
@@ -9,7 +9,7 @@ const input = 'input';
 * @polymer
 * @demo demo/index.html
 */
-export class XtalMethod extends HTMLElement {
+export class XtalMethod extends XtallatX(HTMLElement) {
 
     _target: HTMLElement;
     get target() {
@@ -18,16 +18,7 @@ export class XtalMethod extends HTMLElement {
     set target(val) {
         this._target = val;
     }
-    get disabled() {
-        return this.hasAttribute(disabled)
-    }
-    set disabled(val) {
-        if (val) {
-            this.setAttribute(disabled, '');
-        } else {
-            this.removeAttribute(disabled);
-        }
-    }
+
     _renderer: (formatter, target) => any;
     set renderer(val: (formatter, target) => any) {
         this._renderer = val;
@@ -41,21 +32,10 @@ export class XtalMethod extends HTMLElement {
         return [disabled, input];
     }
 
-    _upgradeProperties(props: string[]) {
-        props.forEach(prop => {
-            if (this.hasOwnProperty(prop)) {
-                let value = this[prop];
-                delete this[prop];
-                this[prop] = value;
-            }
-        })
-
-    }
 
     _derenderer: (element: HTMLElement) => any;
     set derenderer(val: (element: HTMLElement) => any) {
         this._derenderer = val;
-        this.derender();
     }
     get derenderer() {
         return this._derenderer;
@@ -64,13 +44,9 @@ export class XtalMethod extends HTMLElement {
     _initState: any;
     set initState(val: any) {
         this._initState = val;
-        this.dispatchEvent(new CustomEvent('init-state-changed', {
-            detail: {
-                value: val
-            },
-            bubbles: true,
-            composed: true
-        } as CustomEventInit));
+        this.de('init-state', {
+            value: val,
+        })
     }
     get initState() {
         return this._initState;
@@ -79,13 +55,9 @@ export class XtalMethod extends HTMLElement {
     _input;
     set input(val: object) {
         this._input = val;
-        this.render();
     }
     get input() {
         return this._input;
-    }
-    disconnectedCallback() {
-        //this._domObserver.disconnect();
     }
 
     connectedCallback() {
@@ -105,7 +77,7 @@ export class XtalMethod extends HTMLElement {
     }
 
     derender() {
-        if (!this._derenderer || this.disabled) return;
+        if (!this._derenderer) return;
         if (!this._target) {
             this._target = this.querySelector('[role="target"]');
             if (!this._target) return; //add mutation observer?     
@@ -113,7 +85,7 @@ export class XtalMethod extends HTMLElement {
         this.initState = this._derenderer(this._target);
     }
     render() {
-        if (!this._renderer || !this._input || this.disabled) return;
+        if (!this._renderer || !this._input) return;
         if (this._initState === this._input) {
             delete this._initState;
             return;
@@ -132,7 +104,9 @@ export class XtalMethod extends HTMLElement {
         this._renderer(this._input, this._target);
     }
 
-
+    onPropsChange(){
+        if(this._disabled) return;
+    }
 
 }
 

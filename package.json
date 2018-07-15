@@ -8,14 +8,20 @@
   "author": "bahrus <anderson.bruce.b@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@polymer/polymer": "^3.0.0"
+    "xtal-latx": "0.0.17"
   },
   "devDependencies": {
     "@polymer/iron-demo-helpers": "^3.0.0-pre.12",
+    "@polymer/polymer": "^3.0.0",
     "@webcomponents/webcomponentsjs": "^2.0.0",
     "wct-browser-legacy": "^1.0.0"
   },
   "engines": {
     "yarn": ">= 1.0.0"
+  },
+  "resolutions": {
+    "type-detect": "1.0.0",
+    "supports-color": "3.1.2",
+    "samsam": "1.1.2"
   }
 }
