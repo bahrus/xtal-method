@@ -57,17 +57,17 @@
             const modifiedText = splitText.join('');
             //const async = modifiedText.indexOf('await ') > -1 ? 'async' : '';
             const async = 'async';
-            const protectedScript = `[
+            const protectedScript = `(
             ${async} function () {
                 const exportconst = {};
                 ${modifiedText}
                 return exportconst;
             }
-            ]`;
+            )`;
             const fnArr =  eval(protectedScript);
             const target = this;
             if(async){
-                const exportedSymbols = fnArr[0]().then(exportedSymbols =>{
+                const exportedSymbols = fnArr().then(exportedSymbols =>{
                     Object.assign(target, exportedSymbols);
                 }).catch(e =>{
                     throw e;

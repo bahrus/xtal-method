@@ -22,7 +22,7 @@ Polymer notation:
     <xtal-method input="[[todos]]" renderer="[[todoFormatter]]"></xtal-method>
 ``` 
 
-JSX:notation:
+JSX notation:
 
 ```html
     <xtal-method input={this.todos} renderer={this.todoFormatter}></xtal-method>
@@ -93,7 +93,7 @@ The script tag inside the \<xtal-inline-method\> allows us to specify these two 
 
 ```html
 <xtal-im-ex>
-    <script type="module ish">
+    <script nomodule>
         const root = 'https://cdn.jsdelivr.net/npm/lit-html/';
         const { repeat } = await import(root + 'lib/repeat.js');
         const { html, render } = await import(root + 'lit-html.js');
@@ -146,7 +146,7 @@ And then reference it as follows:
 
 ```html
 <xtal-im-ex input="[[todos]]">
-    <script type="module ish">
+    <script nomodule>
         XtalIMEX.insert(_root_lit_html, _lit_html, _lit_repeat);
         const todoFormatter = items => html`
             <h1>My Todos</h1>
@@ -174,7 +174,7 @@ If we place the inline code inside a light child, like this:
 ```html
 <my-component>
     <xtal-im-ex input="[[todos]]" disabled >
-        <script type="module ish">
+        <script nomodule>
         ...
         </script>
     </xtal-im-ex>
@@ -313,7 +313,7 @@ That markup could look as follows:
 ```html
 <xtal-method>
     <xtal-import-export>
-    <script type="module ish">
+    <script nomodule>
         
         XtalIMEX.insert(_root_lit_html, _lit_html, _lit_repeat); 
         const todoFormatter = items => html`
