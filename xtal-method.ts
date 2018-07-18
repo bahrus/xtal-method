@@ -1,6 +1,7 @@
 import {XtallatX} from 'xtal-latx/xtal-latx.js'
 const disabled = 'disabled';
 const input = 'input';
+
 /**
 * `xtal-method`
 * Create a localized link between an input object and a functional renderer

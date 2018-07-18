@@ -1,4 +1,11 @@
 import { XtalMethod } from './xtal-method.js';
+let supportsAsync = true;
+try {
+    eval('Object.getPrototypeOf(async function(){}).constructor');
+}
+catch (e) {
+    supportsAsync = false;
+}
 /**
 * `xtal-im-ex`
 * Set properties of a parent custom element using ES6 module notation
@@ -58,7 +65,7 @@ class XtalIMEX extends XtalMethod {
         }
         const modifiedText = splitText.join('');
         //const async = modifiedText.indexOf('await ') > -1 ? 'async' : '';
-        const async = 'async';
+        const async = supportsAsync ? 'async' : '';
         const protectedScript = `(
             ${async} function () {
                 const exportconst = {};

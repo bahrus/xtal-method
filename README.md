@@ -310,6 +310,7 @@ To help manage this complex song and dance, xtal-method will expose to its peers
 
 That markup could look as follows:
 
+
 ```html
 <xtal-method>
     <xtal-import-export>
