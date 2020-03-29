@@ -8,10 +8,11 @@
   "author": "bahrus <anderson.bruce.b@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "xtal-latx": "0.0.88"
+    "trans-render": "0.0.143",
+    "xtal-element": "0.0.101"
   },
   "devDependencies": {
-    "@webcomponents/webcomponentsjs": "2.2.7"
+    "@webcomponents/webcomponentsjs": "2.4.3"
   },
   "engines": {
     "yarn": ">= 1.0.0"

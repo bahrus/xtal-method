@@ -1,4 +1,6 @@
-import { XtallatX } from 'xtal-latx/xtal-latx.js';
+import { XtallatX } from 'xtal-element/xtal-latx.js';
+import { hydrate } from 'trans-render/hydrate.js';
+import { define } from 'trans-render/define.js';
 const disabled = 'disabled';
 const input = 'input';
 /**
@@ -9,7 +11,7 @@ const input = 'input';
 * @polymer
 * @demo demo/index.html
 */
-export class XtalMethod extends XtallatX(HTMLElement) {
+export class XtalMethod extends XtallatX(hydrate(HTMLElement)) {
     get target() {
         return this._target;
     }
@@ -98,7 +100,4 @@ export class XtalMethod extends XtallatX(HTMLElement) {
             return;
     }
 }
-if (!customElements.get(XtalMethod.is)) {
-    customElements.define(XtalMethod.is, XtalMethod);
-}
-//# sourceMappingURL=xtal-method.js.map
+define(XtalMethod);

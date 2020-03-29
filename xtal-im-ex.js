@@ -92,4 +92,3 @@ class XtalIMEX extends XtalMethod {
     }
 }
 customElements.define(XtalIMEX.is, XtalIMEX);
-//# sourceMappingURL=xtal-im-ex.js.map
